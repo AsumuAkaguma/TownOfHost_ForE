@@ -22,7 +22,7 @@ BANの対象となりますのでご注意ください。<br>
 
 ## リリース
 
-AmongUsバージョン : **2023.11.28**
+AmongUsバージョン : **2024.03.05**
 
 **本家最新版は[こちら](https://github.com/tukasa0001/TownOfHost/releases/latest)**<br>
 

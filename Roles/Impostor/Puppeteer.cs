@@ -76,7 +76,7 @@ public sealed class Puppeteer : RoleBase, IImpostor
         Utils.NotifyRoles(SpecifySeer: puppeteer);
         info.DoKill = false;
     }
-    public override bool OnReportDeadBody(PlayerControl _, GameData.PlayerInfo __)
+    public override bool OnReportDeadBody(PlayerControl _, NetworkedPlayerInfo __)
     {
         Puppets.Clear();
         SendRPC(byte.MaxValue, 0);

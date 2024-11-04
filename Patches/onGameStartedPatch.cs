@@ -108,7 +108,7 @@ namespace TownOfHostForE
                 pc.cosmetics.nameText.text = pc.name;
 
                 var outfit = pc.Data.DefaultOutfit;
-                Camouflage.PlayerSkins[pc.PlayerId] = new GameData.PlayerOutfit().Set(outfit.PlayerName, outfit.ColorId, outfit.HatId, outfit.SkinId, outfit.VisorId, outfit.PetId);
+                Camouflage.PlayerSkins[pc.PlayerId] = new NetworkedPlayerInfo.PlayerOutfit().Set(outfit.PlayerName, outfit.ColorId, outfit.HatId, outfit.SkinId, outfit.VisorId, outfit.PetId);
                 Main.clientIdList.Add(pc.GetClientId());
             }
             Main.VisibleTasksCount = true;
@@ -152,7 +152,7 @@ namespace TownOfHostForE
 
             if (Options.CurrentGameMode != CustomGameMode.HideAndSeek)
             {
-                RoleTypes[] RoleTypesList = { RoleTypes.Scientist, RoleTypes.Engineer, RoleTypes.Shapeshifter };
+                RoleTypes[] RoleTypesList = { RoleTypes.Scientist, RoleTypes.Engineer, RoleTypes.Noisemaker, RoleTypes.Tracker, RoleTypes.Shapeshifter, RoleTypes.Phantom };
                 foreach (var roleTypes in RoleTypesList)
                 {
                     var roleOpt = Main.NormalOptions.roleOptions;
@@ -216,7 +216,10 @@ namespace TownOfHostForE
             List<PlayerControl> Scientists = new();
             List<PlayerControl> Engineers = new();
             List<PlayerControl> GuardianAngels = new();
+            List<PlayerControl> Trackers = new();
+            List<PlayerControl> Noisemakers = new();
             List<PlayerControl> Shapeshifters = new();
+            List<PlayerControl> Phantoms = new();
 
             List<PlayerControl> allPlayersbySub = new();
 
@@ -254,6 +257,18 @@ namespace TownOfHostForE
                     case RoleTypes.Shapeshifter:
                         Shapeshifters.Add(pc);
                         role = CustomRoles.Shapeshifter;
+                        break;
+                    case RoleTypes.Tracker:
+                        Trackers.Add(pc);
+                        role = CustomRoles.Tracker;
+                        break;
+                    case RoleTypes.Noisemaker:
+                        Noisemakers.Add(pc);
+                        role = CustomRoles.Noisemaker;
+                        break;
+                    case RoleTypes.Phantom:
+                        Phantoms.Add(pc);
+                        role = CustomRoles.Phantom;
                         break;
                     default:
                         Logger.SendInGame(string.Format(GetString("Error.InvalidRoleAssignment"), pc?.Data?.PlayerName));
@@ -323,8 +338,11 @@ namespace TownOfHostForE
                     {
                         RoleTypes.Impostor => Impostors,
                         RoleTypes.Shapeshifter => Shapeshifters,
+                        RoleTypes.Phantom => Phantoms,
                         RoleTypes.Scientist => Scientists,
                         RoleTypes.Engineer => Engineers,
+                        RoleTypes.Noisemaker => Noisemakers,
+                        RoleTypes.Tracker => Trackers,
                         RoleTypes.GuardianAngel => GuardianAngels,
                         _ => Crewmates,
                     };
@@ -405,7 +423,7 @@ namespace TownOfHostForE
                     }
                 }
 
-                RoleTypes[] RoleTypesList = { RoleTypes.Scientist, RoleTypes.Engineer, RoleTypes.Shapeshifter };
+                RoleTypes[] RoleTypesList = { RoleTypes.Scientist, RoleTypes.Engineer, RoleTypes.Noisemaker, RoleTypes.Tracker, RoleTypes.Shapeshifter, RoleTypes.Phantom };
                 foreach (var roleTypes in RoleTypesList)
                 {
                     var roleOpt = Main.NormalOptions.roleOptions;
@@ -497,14 +515,15 @@ namespace TownOfHostForE
                 }
                 RpcSetRoleReplacer.OverriddenSenderList.Add(senders[player.PlayerId]);
                 //ホスト視点はロール決定
-                if (player.PlayerId == hostId)
-                {
-                    player.SetRole(selfRole);
-                }
-                else
-                {
-                    player.SetRole(othersRole);
-                }
+                player.StartCoroutine(player.CoSetRole(othersRole, false));
+//                if (player.PlayerId == hostId)
+//                {
+//                    player.RpcSetRole(selfRole);
+//                }
+//                else
+//                {
+//                    player.RpcSetRole(othersRole);
+//                }
                 player.Data.IsDead = true;
                 realAssigned++;
 
@@ -680,9 +699,11 @@ namespace TownOfHostForE
 
                     foreach (var pair in StoragedData)
                     {
-                        pair.Item1.SetRole(pair.Item2);
+                        pair.Item1.StartCoroutine(pair.Item1.CoSetRole(pair.Item2, false));
+
                         sender.Value.AutoStartRpc(pair.Item1.NetId, (byte)RpcCalls.SetRole, Utils.GetPlayerById(sender.Key).GetClientId())
                             .Write((ushort)pair.Item2)
+                            .Write(false)
                             .EndRpc();
                     }
                     sender.Value.EndMessage();

@@ -46,9 +46,9 @@ namespace TownOfHostForE
             }
             if (GameStates.IsLobby)
             {
-                __instance.GameSettings.text = OptionShower.GetText();
-                __instance.GameSettings.fontSizeMin =
-                __instance.GameSettings.fontSizeMax = (TranslationController.Instance.currentLanguage.languageID == SupportedLangs.Japanese || Main.ForceJapanese.Value) ? 1.05f : 1.2f;
+//                __instance.GameSettings.text = OptionShower.GetText();
+//                __instance.GameSettings.fontSizeMin =
+//                __instance.GameSettings.fontSizeMax = (TranslationController.Instance.currentLanguage.languageID == SupportedLangs.Japanese || Main.ForceJapanese.Value) ? 1.05f : 1.2f;
             }
             //ゲーム中でなければ以下は実行されない
             if (!AmongUsClient.Instance.IsGameStarted) return;

@@ -4,6 +4,7 @@ using InnerNet;
 using UnityEngine;
 using TownOfHostForE.Modules;
 using static TownOfHostForE.Translator;
+using Hazel; 
 
 namespace TownOfHostForE
 {
@@ -124,12 +125,101 @@ namespace TownOfHostForE
         }
     }
     [HarmonyPatch(typeof(InnerNetClient), nameof(InnerNetClient.SendAllStreamedObjects))]
+//    class InnerNetObjectSerializePatch
+//    {
+//        public static void Prefix()
+//        {
+//            if (AmongUsClient.Instance.AmHost)
+//                GameOptionsSender.SendAllGameOptions();
+//        }
+//    }
+
     class InnerNetObjectSerializePatch
     {
-        public static void Prefix()
+        public static bool Prefix(InnerNetClient __instance, ref bool __result)
         {
             if (AmongUsClient.Instance.AmHost)
                 GameOptionsSender.SendAllGameOptions();
+
+            //9人以上部屋で落ちる現象の対策コード
+            if (!Options.FixSpawnPacketSize.GetBool()) return true;
+
+            var sended = false;
+            __result = false;
+            var obj = __instance.allObjects;
+            lock (obj)
+            {
+                for (int i = 0; i < __instance.allObjects.Count; i++)
+                {
+                    InnerNetObject innerNetObject = __instance.allObjects[i];
+                    if (innerNetObject && innerNetObject.IsDirty && (innerNetObject.AmOwner ||
+                        (innerNetObject.OwnerId == -2 && __instance.AmHost)))
+                    {
+                        var messageWriter = __instance.Streams[(byte)innerNetObject.sendMode];
+                        if (messageWriter.Length > 500)
+                        {
+                            if (!sended)
+                            {
+                                if (DebugModeManager.IsDebugMode)
+                                {
+                                    Logger.Info($"SendAllStreamedObjects: Start", "InnerNetClient");
+                                }
+                                sended = true;
+                            }
+                            messageWriter.EndMessage();
+                            __instance.SendOrDisconnect(messageWriter);
+                            messageWriter.Clear(innerNetObject.sendMode);
+                            messageWriter.StartMessage(5);
+                            messageWriter.Write(__instance.GameId);
+                        }
+                        messageWriter.StartMessage(1);
+                        messageWriter.WritePacked(innerNetObject.NetId);
+                        try
+                        {
+                            if (innerNetObject.Serialize(messageWriter, false))
+                            {
+                                messageWriter.EndMessage();
+                            }
+                            else
+                            {
+                                messageWriter.CancelMessage();
+                            }
+                            if (innerNetObject.Chunked && innerNetObject.IsDirty)
+                            {
+                                Logger.Info($"SendAllStreamedObjects: Chunked", "InnerNetClient");
+                                __result = true;
+                            }
+                        }
+                        catch (System.Exception ex)
+                        {
+                            Logger.Info($"Exception:{ex.Message}", "InnerNetClient");
+                            messageWriter.CancelMessage();
+                        }
+                    }
+                }
+            }
+            for (int j = 0; j < __instance.Streams.Length; j++)
+            {
+                MessageWriter messageWriter2 = __instance.Streams[j];
+                if (messageWriter2.HasBytes(7))
+                {
+                    if (!sended)
+                    {
+                        if (DebugModeManager.IsDebugMode)
+                        {
+                            Logger.Info($"SendAllStreamedObjects: Start", "InnerNetClient");
+                        }
+                        sended = true;
+                    }
+                    messageWriter2.EndMessage();
+                    __instance.SendOrDisconnect(messageWriter2);
+                    messageWriter2.Clear((SendOption)j);
+                    messageWriter2.StartMessage(5);
+                    messageWriter2.Write(__instance.GameId);
+                }
+            }
+            if (DebugModeManager.IsDebugMode && sended) Logger.Info($"SendAllStreamedObjects: End", "InnerNetClient");
+            return false;
         }
     }
 }

@@ -51,7 +51,7 @@ namespace TownOfHostForE
 
             Main.NormalOptions.KillCooldown = Options.DefaultKillCooldown;
             //winnerListリセット
-            TempData.winners = new Il2CppSystem.Collections.Generic.List<WinningPlayerData>();
+//            TempData.winners = new Il2CppSystem.Collections.Generic.List<WinningPlayerData>();
             var winner = new List<PlayerControl>();
             foreach (var pc in Main.AllPlayerControls)
             {
@@ -117,7 +117,7 @@ namespace TownOfHostForE
             {
                 if (CustomWinnerHolder.WinnerTeam is not CustomWinner.Draw && pc.Is(CustomRoles.GM)) continue;
 
-                TempData.winners.Add(new WinningPlayerData(pc.Data));
+//                TempData.winners.Add(new WinningPlayerData(pc.Data));
                 Main.winnerList.Add(pc.PlayerId);
                 if (BetWinTeams.BetWinTeamMode.GetBool())
                 {

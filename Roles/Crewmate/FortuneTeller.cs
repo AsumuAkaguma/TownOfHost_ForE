@@ -152,7 +152,7 @@ public sealed class FortuneTeller : RoleBase
             SetForecastResult();
         }
     }
-    public override bool OnReportDeadBody(PlayerControl reporter, GameData.PlayerInfo target)
+    public override bool OnReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target)
     {
         SendReportRPC();
         SetForecastResult();

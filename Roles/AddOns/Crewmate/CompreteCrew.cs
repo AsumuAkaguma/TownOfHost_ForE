@@ -10,10 +10,11 @@ namespace TownOfHostForE.Roles.AddOns.Crewmate
     public static class CompreteCrew
     {
         private static readonly int Id = 72000;
+        private static Color RoleColor = Utils.GetRoleColor(CustomRoles.CompreteCrew);
         public static List<byte> playerIdList = new();
         public static void SetupCustomOption()
         {
-            Options.SetupRoleOptions(Id, TabGroup.Addons, CustomRoles.CompreteCrew);
+            Options.SetupRoleOptions(Id, TabGroup.Addons, CustomRoles.CompreteCrew, RoleColor);
             Options.SetUpAddOnOptions(Id + 10, CustomRoles.CompreteCrew, TabGroup.Addons);
         }
         [GameModuleInitializer]

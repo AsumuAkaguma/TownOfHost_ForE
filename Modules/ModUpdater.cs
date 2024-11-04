@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
@@ -67,7 +68,7 @@ namespace TownOfHostForE
                     latestVersion = new(data["tag_name"]?.ToString().TrimStart('v'));
                     //latestTitle = $"Ver. {latestVersion}";
                     latestTitle = $"{data["name"].ToString().Replace("リリース","")}";
-                    JArray assets = data["assets"].Cast<JArray>();
+                    JArray assets = (JArray)data["assets"].Cast<JArray>();
 
                     for (int i = 0; i < assets.Count; i++)
                     {

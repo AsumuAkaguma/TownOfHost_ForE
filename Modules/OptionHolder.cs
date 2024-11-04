@@ -12,6 +12,7 @@ using TownOfHostForE.Roles.AddOns.Common;
 using TownOfHostForE.Roles.AddOns.Impostor;
 using TownOfHostForE.Roles.AddOns.Crewmate;
 using TownOfHostForE.Roles.AddOns.NotCrew;
+using TownOfHostForE.Modules.OptionItems;
 using TownOfHostForE.GameMode;
 using static TownOfHostForE.GameMode.WordLimit;
 using static TownOfHostForE.Roles.Crewmate.Tiikawa;
@@ -345,6 +346,8 @@ namespace TownOfHostForE
         public static OptionItem KickPlayerFriendCodeNotExist;
         public static OptionItem ApplyBanList;
 
+        public static OptionItem FixSpawnPacketSize;
+
         //発言制限モード
         public static OptionItem WordLimitOptions;
 
@@ -424,6 +427,11 @@ namespace TownOfHostForE
         {
             if (IsLoaded) return;
             OptionSaver.Initialize();
+
+            //9人以上部屋で落ちる現象の対策
+            FixSpawnPacketSize = BooleanOptionItem.Create(1_000_200, "FixSpawnPacketSize", false, TabGroup.MainSettings, true)
+                .SetColor(new Color32(255, 255, 0, 255))
+                .SetGameMode(CustomGameMode.All);
 
             // プリセット
             _ = PresetOptionItem.Create(0, TabGroup.MainSettings)
@@ -589,7 +597,11 @@ namespace TownOfHostForE
             });
 
             // Add-Ons
-            SetupSingleRoleOptions(73000, TabGroup.Addons, CustomRoles.Lovers, 2);
+
+//                        SetupRoleOptions(50300, TabGroup.Addons, CustomRoles.Lovers, Utils.GetRoleColor(CustomRoles.Lovers), assignCountRule: new(2, 2, 2));
+
+//                        SetupSingleRoleOptions(73000, TabGroup.Addons, CustomRoles.Lovers, 2);
+            SetupRoleOptions(73000, TabGroup.Addons, CustomRoles.Lovers, Utils.GetRoleColor(CustomRoles.Lovers), assignCountRule: new(2, 2, 2));
             LoversAddWin = BooleanOptionItem.Create(73010, "LoversAddWin", false, TabGroup.Addons, false).SetParent(CustomRoleSpawnChances[CustomRoles.Lovers]);
             LastImpostor.SetupCustomOption();
             CompreteCrew.SetupCustomOption();
@@ -630,8 +642,8 @@ namespace TownOfHostForE
 
             // HideAndSeek
             /********************************************************************************/
-            SetupRoleOptions(200000, TabGroup.MainSettings, CustomRoles.HASFox, customGameMode: CustomGameMode.HideAndSeek);
-            SetupRoleOptions(200100, TabGroup.MainSettings, CustomRoles.HASTroll, customGameMode: CustomGameMode.HideAndSeek);
+            SetupRoleOptions(200000, TabGroup.MainSettings, CustomRoles.HASFox, Utils.GetRoleColor(CustomRoles.HASFox), customGameMode: CustomGameMode.HideAndSeek);
+            SetupRoleOptions(200100, TabGroup.MainSettings, CustomRoles.HASTroll, Utils.GetRoleColor(CustomRoles.HASTroll), customGameMode: CustomGameMode.HideAndSeek);
             AllowCloseDoors = BooleanOptionItem.Create(201000, "AllowCloseDoors", false, TabGroup.MainSettings, false)
                 .SetHeader(true)
                 .SetGameMode(CustomGameMode.HideAndSeek);
@@ -919,17 +931,21 @@ namespace TownOfHostForE
                             or "ChangeIntro";
         }
         public static void SetupRoleOptions(SimpleRoleInfo info) =>
-            SetupRoleOptions(info.ConfigId, info.Tab, info.RoleName, info.AssignInfo.AssignCountRule);
-        public static void SetupRoleOptions(int id, TabGroup tab, CustomRoles role, IntegerValueRule assignCountRule = null, CustomGameMode customGameMode = CustomGameMode.Standard)
+             SetupRoleOptions(info.ConfigId, info.Tab, info.RoleName, info.RoleColor, info.AssignInfo.AssignCountRule);
+        public static void SetupRoleOptions(int id, TabGroup tab, CustomRoles role, Color roleColor, IntegerValueRule assignCountRule = null, CustomGameMode customGameMode = CustomGameMode.Standard)
         {
             if (role.IsVanilla()) return;
             assignCountRule ??= new(1, 15, 1);
 
-            var spawnOption = IntegerOptionItem.Create(id, role.ToString(), new(0, 100, 10), 0, tab, false).SetColor(Utils.GetRoleColor(role))
-                .SetColor(Utils.GetRoleColor(role))
-                .SetValueFormat(OptionFormat.Percent)
-                .SetHeader(true)
-                .SetGameMode(customGameMode) as IntegerOptionItem;
+            var spawnOption = new RoleSpawnChanceOptionItem(id, role.ToString(), 0, tab, false, new(0, 100, 10), role, roleColor);
+            spawnOption.SetColor(Utils.GetRoleColor(role))
+             .SetValueFormat(OptionFormat.Percent)
+             .SetHeader(true)
+             .SetGameMode(customGameMode);
+
+//            var spawnOption = IntegerOptionItem.Create(id, role.ToString(), new(0, 100, 10), 0, tab, false).SetColor(Utils.GetRoleColor(role))
+//                .SetColor(Utils.GetRoleColor(role))
+//                .SetGameMode(customGameMode) as IntegerOptionItem;
             var countOption = IntegerOptionItem.Create(id + 1, "Maximum", assignCountRule, assignCountRule.Step, tab, false)
                 .SetParent(spawnOption)
                 .SetValueFormat(OptionFormat.Players)

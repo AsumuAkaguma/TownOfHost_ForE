@@ -97,6 +97,7 @@ namespace TownOfHostForE
             switch (rpcType)
             {
                 case RpcCalls.SetName: //SetNameRPC
+                    subReader.ReadUInt32();
                     string name = subReader.ReadString();
                     if (subReader.BytesRemaining > 0 && subReader.ReadBoolean()) return false;
                     Logger.Info("名前変更:" + __instance.GetNameWithRole() + " => " + name, "SetName");
@@ -433,7 +434,7 @@ namespace TownOfHostForE
             writer.Write(killerId);
             AmongUsClient.Instance.FinishRpcImmediately(writer);
         }
-        public static void ReportDeadBodyForced(this PlayerControl player, GameData.PlayerInfo target)
+        public static void ReportDeadBodyForced(this PlayerControl player, NetworkedPlayerInfo target)
         {
             //PlayerControl.ReportDeadBodyと同様の処理
             if (!AmongUsClient.Instance.AmHost) return;

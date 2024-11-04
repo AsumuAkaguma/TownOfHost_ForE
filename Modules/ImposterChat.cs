@@ -35,7 +35,13 @@ namespace TownOfHostForE
             //誰
             Who,
             //何処
-            Where
+            Where,
+            //個人作成
+            Action,
+            Sabo,
+            Kill,
+            Button,
+            Giron
         }
         private class chatData
         {
@@ -242,6 +248,12 @@ namespace TownOfHostForE
                     ChatDatas[voterId].Target = WhoWhere.Where;
                     CreateTargetWordsForPlace(voterId);
                     break;
+                //個人作成
+                case 2:
+                    ChatDatas[voterId].NowState = nowState.SetTarget;
+                    ChatDatas[voterId].Target = WhoWhere.Action;
+                    CreateTargetWordsForAction(voterId);
+                    break;
                 default:
                     break;
             }
@@ -289,6 +301,11 @@ namespace TownOfHostForE
             if (ChatDatas[voterId].Target == WhoWhere.Who)
             {
                 SetTargetsForPlayer(voterId,votedId);
+            }
+            //個人作成
+            else if (ChatDatas[voterId].Target == WhoWhere.Action)
+            {
+                SetTargetsForAction(voterId, votedId);
             }
             //場所
             else
@@ -343,6 +360,10 @@ namespace TownOfHostForE
                     case WhoWhere.Where:
                         CreateWhatWordsForPlace(voterId, ChatDatas[voterId].SendData, false);
                         break;
+                    case WhoWhere.Action:
+                        CreateWhatWordsForAction(voterId, ChatDatas[voterId].SendData, false);
+                        break;
+
                 }
                 return;
             }
@@ -507,7 +528,9 @@ namespace TownOfHostForE
                 List<string> data = new()
                 {
                     "プレイヤーを選択する",
-                    "場所を選択する"
+                    "場所を選択する",
+                    //個人作成
+                    "行動を選択する",
                 };
                 //ページ情報記憶
                 //ページ作成
@@ -705,6 +728,193 @@ namespace TownOfHostForE
         {
             if (name == "") name = Utils.ColorString(Color.red, "†インポスターチャット†");
             Utils.SendMessage(data, playerId, name);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        //個人作成
+
+        private static void CreateTargetWordsForAction(byte voterId, bool isFirst = true)
+        {
+            string sendWord = $"送信する行動を選択してください。";
+            if (isFirst)
+            {
+                List<string> data = new()
+                {
+                    $"サボタージュ",
+                    $"キル",
+                    $"ボタン",
+                    $"議論",
+                };
+                //ページ情報記憶
+                //ページ作成
+                CreatePageDatasList(voterId, data);
+                //初期ページ設定
+                ChatDatas[voterId].NowPage = 0;
+            }
+            //反映
+            sendWord += CreatePageWords(PageDatas[voterId][ChatDatas[voterId].NowPage]);
+            sendWord += "Skip:インポスターチャットを中断する。";
+            SendImposterChat(voterId, sendWord);
+        }
+
+        private static void CreateWhatWordsForAction(byte voterId, string action, bool isFirst = true)
+        {
+            string sendWord = $"送信する内容をを選択してください。";
+            if (isFirst)
+            {
+                List<string> data = new()
+                {
+                    $"リアクターを鳴らそう",
+                    $"停電を起こそう",
+                    $"コミュサボを起こそう",
+                    $"酸素サボを起こそう",
+                    $"キノコサボを起こそう",
+                    $"サボタージュは控えよう",
+                    $"諦めて踊り狂おう"
+                };
+                //ページ情報記憶
+                //ページ作成
+                CreatePageDatasList(voterId, data);
+                //初期ページ設定
+                ChatDatas[voterId].NowPage = 0;
+            }
+            //反映
+            sendWord += CreatePageWords(PageDatas[voterId][ChatDatas[voterId].NowPage]);
+            sendWord += "Skip:インポスターチャットを中断する。";
+            SendImposterChat(voterId, sendWord);
+        }
+
+        private static void CreateWhatWordsForAction1(byte voterId, string action, bool isFirst = true)
+        {
+            string sendWord = $"送信する内容をを選択してください。";
+            if (isFirst)
+            {
+                List<string> data = new()
+                {
+                    $"キルは控えよう",
+                    $"キルをしよう",
+                    $"2キルをしよう",
+                    $"3キルをしよう",
+                    $"サボを起こしたらキルしよう",
+                    $"キルは任せて",
+                    $"キルは頼む",
+                    $"俺のそばに近寄るなああーーーーーーーッ"
+                };
+                //ページ情報記憶
+                //ページ作成
+                CreatePageDatasList(voterId, data);
+                //初期ページ設定
+                ChatDatas[voterId].NowPage = 0;
+            }
+            //反映
+            sendWord += CreatePageWords(PageDatas[voterId][ChatDatas[voterId].NowPage]);
+            sendWord += "Skip:インポスターチャットを中断する。";
+            SendImposterChat(voterId, sendWord);
+        }
+
+        private static void CreateWhatWordsForAction2(byte voterId, string action, bool isFirst = true)
+        {
+            string sendWord = $"送信する内容をを選択してください。";
+            if (isFirst)
+            {
+                List<string> data = new()
+                {
+                    $"ボタンは控えよう",
+                    $"ボタンを押そう",
+                    $"キルしてからボタンを押そう",
+                    $"サボを起こしてからボタンを押そう",
+                    $"ボタンは任せて",
+                    $"ボタンは頼む",
+                    $"立てば芍薬座ればボタン歩く姿は百合の花"
+                };
+                //ページ情報記憶
+                //ページ作成
+                CreatePageDatasList(voterId, data);
+                //初期ページ設定
+                ChatDatas[voterId].NowPage = 0;
+            }
+            //反映
+            sendWord += CreatePageWords(PageDatas[voterId][ChatDatas[voterId].NowPage]);
+            sendWord += "Skip:インポスターチャットを中断する。";
+            SendImposterChat(voterId, sendWord);
+        }
+
+        private static void CreateWhatWordsForAction3(byte voterId, string action, bool isFirst = true)
+        {
+            string sendWord = $"送信する内容をを選択してください。";
+            if (isFirst)
+            {
+                List<string> data = new()
+                {
+                    $"議論は目立たないようにしよう",
+                    $"議論は積極的にしよう",
+                    $"キルの話をしよう",
+                    $"ラインの話をしよう",
+                    $"ライン切りしよう",
+                    $"クルーに吊りを誘導しよう",
+                    $"マッドに吊りを誘導しよう",
+                    $"第三陣営に吊りを誘導しよう",
+                    $"スキップに誘導しよう",
+                    $"議論は任せて",
+                    $"議論は頼む",
+                    $"ずんだもんなのだ　今回は諦めの自白について解説していくのだ"
+                };
+                //ページ情報記憶
+                //ページ作成
+                CreatePageDatasList(voterId, data);
+                //初期ページ設定
+                ChatDatas[voterId].NowPage = 0;
+            }
+            //反映
+            sendWord += CreatePageWords(PageDatas[voterId][ChatDatas[voterId].NowPage]);
+            sendWord += "Skip:インポスターチャットを中断する。";
+            SendImposterChat(voterId, sendWord);
+        }
+
+
+
+
+
+        private static void SetTargetsForAction(byte voterId, byte picNum)
+        {
+
+            //次ページ対象なら次へ
+            if (CheckPages(voterId, picNum) == false)
+            {
+                CreateTargetWordsForAction(voterId, false);
+                return;
+            }
+
+
+            //このページで選ばれた場合
+            //今のページ
+            int nowPage = ChatDatas[voterId].NowPage;
+            //選ばれたやつ
+            string actionName = PageDatas[voterId][nowPage][picNum];
+            ChatDatas[voterId].SendData = $"{actionName}";
+            ChatDatas[voterId].NowState = nowState.SetWhat;
+            if (actionName == "サボタージュ") CreateWhatWordsForAction(voterId, actionName);
+            if (actionName == "キル") CreateWhatWordsForAction1(voterId, actionName);
+            if (actionName == "ボタン") CreateWhatWordsForAction2(voterId, actionName);
+            if (actionName == "議論") CreateWhatWordsForAction3(voterId, actionName);
         }
     }
 

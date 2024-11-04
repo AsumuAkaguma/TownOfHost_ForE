@@ -18,7 +18,7 @@ public static class Management
 
     public static void SetupCustomOption()
     {
-        SetupRoleOptions(Id, TabGroup.Addons, CustomRoles.Management);
+        SetupRoleOptions(Id, TabGroup.Addons, CustomRoles.Management, RoleColor);
         OptionSeeNowtask = BooleanOptionItem.Create(Id + 10, "ManagementSeeNowtask", true, TabGroup.Addons, false);
     }
     [GameModuleInitializer]

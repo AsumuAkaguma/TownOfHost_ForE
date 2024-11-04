@@ -15,7 +15,7 @@ public static class Autopsy
 
     public static void SetupCustomOption()
     {
-        SetupRoleOptions(Id, TabGroup.Addons, CustomRoles.Autopsy);
+        SetupRoleOptions(Id, TabGroup.Addons, CustomRoles.Autopsy, RoleColor);
     }
     [GameModuleInitializer]
     public static void Init()

@@ -15,7 +15,7 @@ public static class NonReport
 
     public static void SetupCustomOption()
     {
-        SetupRoleOptions(Id, TabGroup.Addons, CustomRoles.NonReport);
+        SetupRoleOptions(Id, TabGroup.Addons, CustomRoles.NonReport, RoleColor);
     }
     [GameModuleInitializer]
     public static void Init()

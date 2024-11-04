@@ -15,7 +15,7 @@ public static class AddSeer
 
     public static void SetupCustomOption()
     {
-        SetupRoleOptions(Id, TabGroup.Addons, CustomRoles.AddSeer);
+        SetupRoleOptions(Id, TabGroup.Addons, CustomRoles.AddSeer, RoleColor);
     }
     [GameModuleInitializer]
     public static void Init()

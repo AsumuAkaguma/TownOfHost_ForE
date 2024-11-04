@@ -17,7 +17,7 @@ public static class AddWatch
 
     public static void SetupCustomOption()
     {
-        SetupRoleOptions(Id, TabGroup.Addons, CustomRoles.AddWatch);
+        SetupRoleOptions(Id, TabGroup.Addons, CustomRoles.AddWatch, RoleColor);
     }
     [GameModuleInitializer]
     public static void Init()

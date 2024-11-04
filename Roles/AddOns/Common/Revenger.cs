@@ -15,7 +15,7 @@ public static class Revenger
 
     public static void SetupCustomOption()
     {
-        SetupRoleOptions(Id, TabGroup.Addons, CustomRoles.Revenger);
+        SetupRoleOptions(Id, TabGroup.Addons, CustomRoles.Revenger, RoleColor);
     }
     [GameModuleInitializer]
     public static void Init()

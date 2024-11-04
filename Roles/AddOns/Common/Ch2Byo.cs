@@ -18,7 +18,7 @@ public static class Chu2Byo
 
     public static void SetupCustomOption()
     {
-        SetupRoleOptions(Id, TabGroup.Addons, CustomRoles.Chu2Byo);
+        SetupRoleOptions(Id, TabGroup.Addons, CustomRoles.Chu2Byo, RoleColor);
     }
     [GameModuleInitializer]
     public static void Init()

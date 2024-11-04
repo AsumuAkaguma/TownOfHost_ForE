@@ -22,7 +22,7 @@ public static class Sunglasses
 
     public static void SetupCustomOption()
     {
-        SetupRoleOptions(Id, TabGroup.Addons, CustomRoles.Sunglasses);
+        SetupRoleOptions(Id, TabGroup.Addons, CustomRoles.Sunglasses, RoleColor);
         OptionSubCrewmateVision = FloatOptionItem.Create(Id + 10, "SunglassesSubCrewmateVision", new(0f, 5f, 0.05f), 0.2f, TabGroup.Addons, false)
             .SetValueFormat(OptionFormat.Multiplier).SetGameMode(CustomGameMode.Standard);
         OptionSubImpostorVision = FloatOptionItem.Create(Id + 11, "SunglassesSubImpostorVision", new(0f, 5f, 0.1f), 0.5f, TabGroup.Addons, false)

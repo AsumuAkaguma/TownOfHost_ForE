@@ -15,7 +15,7 @@ public static class Clumsy
 
     public static void SetupCustomOption()
     {
-        SetupRoleOptions(Id, TabGroup.Addons, CustomRoles.Clumsy);
+        SetupRoleOptions(Id, TabGroup.Addons, CustomRoles.Clumsy, RoleColor);
     }
     [GameModuleInitializer]
     public static void Init()

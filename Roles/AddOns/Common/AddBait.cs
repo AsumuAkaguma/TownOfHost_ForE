@@ -17,7 +17,7 @@ public static class AddBait
 
     public static void SetupCustomOption()
     {
-        SetupRoleOptions(Id, TabGroup.Addons, CustomRoles.AddBait);
+        SetupRoleOptions(Id, TabGroup.Addons, CustomRoles.AddBait, RoleColor);
     }
     [GameModuleInitializer]
     public static void Init()

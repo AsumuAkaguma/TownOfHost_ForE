@@ -15,7 +15,7 @@ public static class VIP
 
     public static void SetupCustomOption()
     {
-        SetupRoleOptions(Id, TabGroup.Addons, CustomRoles.VIP);
+        SetupRoleOptions(Id, TabGroup.Addons, CustomRoles.VIP, RoleColor);
     }
     [GameModuleInitializer]
     public static void Init()

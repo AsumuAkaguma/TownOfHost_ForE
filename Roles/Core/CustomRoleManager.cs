@@ -453,6 +453,7 @@ public enum CustomRoles
     //Impostor(Vanilla)
     Impostor,
     Shapeshifter,
+    Phantom,
     //Impostor
     NormalImpostor,
     NormalShapeshifter,
@@ -512,6 +513,8 @@ public enum CustomRoles
     Engineer,
     GuardianAngel,
     Scientist,
+    Tracker,
+    Noisemaker,
     //Crewmate
     NormalEngineer,
     NormalScientist,

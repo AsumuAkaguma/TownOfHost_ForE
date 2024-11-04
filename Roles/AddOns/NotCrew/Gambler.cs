@@ -32,7 +32,7 @@ public static class Gambler
     }
     public static void SetupCustomOption()
     {
-        SetupRoleOptions(Id, TabGroup.Addons, CustomRoles.Gambler);
+        SetupRoleOptions(Id, TabGroup.Addons, CustomRoles.Gambler, RoleColor);
         GaCanGuessTime = IntegerOptionItem.Create(Id + 10, OptionName.GuesserCanGuessTimes, new(1, 15, 1), 3, TabGroup.Addons, false)
                 .SetValueFormat(OptionFormat.Players);
         GaCanGuessVanilla = BooleanOptionItem.Create(Id + 12, OptionName.EGCanGuessVanilla, false, TabGroup.Addons, false);

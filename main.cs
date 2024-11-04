@@ -65,8 +65,8 @@ namespace TownOfHostForE
         public static string ExceptionMessage;
         public static bool ExceptionMessageIsShown = false;
         public static string credentialsText;
-        public static NormalGameOptionsV07 NormalOptions => GameOptionsManager.Instance.currentNormalGameOptions;
-        public static HideNSeekGameOptionsV07 HideNSeekSOptions => GameOptionsManager.Instance.currentHideNSeekGameOptions;
+        public static NormalGameOptionsV08 NormalOptions => GameOptionsManager.Instance.currentNormalGameOptions;
+        public static HideNSeekGameOptionsV08 HideNSeekSOptions => GameOptionsManager.Instance.currentHideNSeekGameOptions;
         //Client Options
         public static ConfigEntry<string> HideName { get; private set; }
         public static ConfigEntry<string> HideColor { get; private set; }
@@ -144,6 +144,26 @@ namespace TownOfHostForE
         public static int tempImpostorNum = 0;
         public static ConfigEntry<bool> EnableCustomSoundEffect { get; private set; }
         public static ConfigEntry<bool> EnableCustomBGMEffect { get; private set; }
+        public static Color UnityModColor
+        {
+            get
+            {
+                if (!_unityModColor.HasValue)
+                {
+                    if (ColorUtility.TryParseHtmlString(ModColor, out var unityColor))
+                    {
+                        _unityModColor = unityColor;
+                    }
+                    else
+                    {
+                        // failure
+                        return Color.gray;
+                    }
+                }
+                return _unityModColor.Value;
+            }
+        }
+        private static Color? _unityModColor;
         public override void Load()
         {
             Instance = this;

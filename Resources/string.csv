@@ -339,9 +339,12 @@ SBPHideName,Hide Name,名前を隠す,隱藏姓名
 "Crewmate","Crewmate","クルーメイト","船员","船員","Член Экипажа","Tripulante"
 "Engineer","Engineer","エンジニア","工程师","工程師","Инженер","Engenheiro"
 "Scientist","Scientist","科学者","科学家","科學家","Ученый","Cientista"
+"Noisemaker","Noisemaker","ノイズメーカー","","","","",""
+"Tracker","Tracker","トラッカー","","","","",""
 "GuardianAngel","Guardian Angel","守護天使","守护天使","守護天使","Ангел-хранитель","Anjo da Guarda"
 "Impostor","Impostor","インポスター","内鬼","偽裝者","Предатель","Impostor"
 "Shapeshifter","Shapeshifter","シェイプシフター","变形者","變形者","Оборотень","Metamorfo"
+"Phantom","Phantom","亡霊","","","","",""
 "NormalImpostor","Normal Impostor","通常インポスター","普通内鬼"
 "NormalShapeshifter","Shapeshifter","シェイプシフター","变形者","變形者","Оборотень","Metamorfo"
 "NormalEngineer","Engineer","エンジニア","工程师","工程師","Инженер","Engenheiro"
@@ -903,6 +906,8 @@ GhostCanSeeOtherTasks,"Ghosts Can't See Other Tasks","幽霊が他人のタス�
 "ShowReportReason","Show button or report","ボタンかレポートか表示させる","显示按钮或报告"
 "ShowRevengeTarget","Show Revenge player at Meeting","道連れされた人を会議で表示する","在会议上显示复仇玩家"
 "ShowRoleInfoAtFirstMeeting","Show Role description at the first meeting","初めの会議で役職説明を表示する","在第一次会议上显示角色介绍"
+"FixSpawnPacketSize","(Experimental) Only if disconnection occurs with above 8 people.","(試験的機能) 8人以上で切断が発生する場合のみオン"
+
 
 "## ランダムスポーンポイント"
 "Junction","Junction","三叉路"
@@ -1214,6 +1219,10 @@ GhostCanSeeOtherTasks,"Ghosts Can't See Other Tasks","幽霊が他人のタス�
 "PolusReactorTimeLimit","Polus Reactor Duration","ポーラスのリアクター制限時間","波鲁斯抗震稳定器修理时限","Polus地震抑制器破壞最大時間","Polus время саботажа Реактора","Duração do Reator em Polus"
 "AirshipReactorTimeLimit","Airship Reactor Duration","エアシップのリアクター制限時間","飞艇坠毁路线修理时限","Airship間隙室破壞最大時間","Airship время саботажа Реактора","Duração do Reator em Airship"
 
+"## ゲーム設定UI"
+"TOHSettingsButtonLabel","TOH Settings","ＴＯＨ４Ｅ設定","","","","",""
+"TOHSettingsDescription","Edit mod settings for your game lobby.","Modの設定を編集する。","","","","",""
+
 "## クライアント設定"
 "Close","Close","閉じる","","","",""
 "TOHOptions","<color=#18e744>TOH4E</color> Options","<color=#18e744>TOH4E</color>の設定","","","",""
@@ -1336,7 +1345,9 @@ PanAlive13,\nBread was served by the bakery.\nㅤ,\nパン屋は{0}に向けて�
 "TabGroup.MainSettings","Main Settings","メイン設定","主要设置","主要設定","Основная настройка","Configurações Principais"
 "TabGroup.CrewmateRoles","Crewmate Roles","クルー役職","船员阵营职业","","Роли Членов Экипажа","Classes de Tripulante"
 "TabGroup.NeutralRoles","Neutral Roles","ニュートラル役職","独立阵营职业","中立職業設定","Нейтральные Роли","Classes Neutras"
+"TabGroup.AnimalsRoles","Animals Roles","アニマルズ役職","","","",""
 "TabGroup.ImpostorRoles","Impostor Roles","インポスター役職","内鬼阵营职业","偽裝者職業設定","Роли Предателей","Classes de Impostor"
+"TabGroup.MadmateRoles","Madmate Roles","マッドメイト役職","","","",""
 "TabGroup.Addons","Add-Ons","属性","附加效果","副職業設定","Атрибуты","Atributos"
 "ActiveRolesList","Active Roles List","有効な役職一覧","有效职业一览","已開啟職業列表","Список Активных Ролей","Lista de Classes Ativas"
 "ForExample","Example Use","使用例","使用例子","使用例子","Например","Exemplo de Uso"

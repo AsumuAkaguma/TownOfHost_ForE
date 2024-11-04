@@ -82,7 +82,7 @@ namespace TownOfHostForE.Roles.Animals
             info.DoKill = false;
         }
 
-        public override bool OnReportDeadBody(PlayerControl reporter, GameData.PlayerInfo target)
+        public override bool OnReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target)
         {
             //自分のみ
             if (reporter != Player) return true;

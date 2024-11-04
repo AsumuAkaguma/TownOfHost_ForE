@@ -131,7 +131,7 @@ namespace TownOfHostForE.Roles.Animals
         //    //    BittenPlayers.Remove(targetId);
         //    //}
         //}
-        public override bool OnReportDeadBody(PlayerControl _, GameData.PlayerInfo __)
+        public override bool OnReportDeadBody(PlayerControl _, NetworkedPlayerInfo __)
         {
             foreach (var targetId in BittenPlayers.Keys)
             {

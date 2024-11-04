@@ -92,7 +92,7 @@ namespace TownOfHostForE.Roles.Animals
             eatCount = reader.ReadInt32();
         }
 
-        public override bool OnReportDeadBody(PlayerControl reporter, GameData.PlayerInfo target)
+        public override bool OnReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target)
         {
             if (reporter != Player) return true;
             if (target == null) return true;
@@ -117,7 +117,7 @@ namespace TownOfHostForE.Roles.Animals
             Utils.NotifyRoles();
             return false;
         }
-        private static void CheckVultureWin(GameData.PlayerInfo Vulture)
+        private static void CheckVultureWin(NetworkedPlayerInfo Vulture)
         {
             if (!AmongUsClient.Instance.AmHost) return;
             if (eatCount >= VictoryEatDeadBody.GetInt())

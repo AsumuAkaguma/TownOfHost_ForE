@@ -142,7 +142,7 @@ public sealed class AntiComplete : RoleBase
         return (votedForId, numVotes, false);
     }
 
-    public override void OnExileWrapUp(GameData.PlayerInfo exiled, ref bool DecidedWinner)
+    public override void OnExileWrapUp(NetworkedPlayerInfo exiled, ref bool DecidedWinner)
     {
         if (!AmongUsClient.Instance.AmHost || Player.PlayerId != exiled.PlayerId) return;
         if (MyState.DeathReason != CustomDeathReason.Win) return;

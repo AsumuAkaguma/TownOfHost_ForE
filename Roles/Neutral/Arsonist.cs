@@ -128,7 +128,7 @@ public sealed class Arsonist : RoleBase, IKiller
         }
         info.DoKill = false;
     }
-    public override bool OnReportDeadBody(PlayerControl reporter, GameData.PlayerInfo target)
+    public override bool OnReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target)
     {
         TargetInfo = null;
         return true;

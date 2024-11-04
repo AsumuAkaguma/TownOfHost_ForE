@@ -173,7 +173,7 @@ public sealed class PlagueDoctor : RoleBase, IKiller
         //非感染者が死んだ場合勝利するかもしれない
         LateCheckWin = true;
     }
-    public override bool OnReportDeadBody(PlayerControl reporter, GameData.PlayerInfo target)
+    public override bool OnReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target)
     {
         InfectActive = false;
         return true;

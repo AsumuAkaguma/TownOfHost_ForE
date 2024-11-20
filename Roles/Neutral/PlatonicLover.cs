@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using AmongUs.GameOptions;
 
-
+using TownOfHostForE.Modules;
 using TownOfHostForE.Roles.Core;
 using TownOfHostForE.Roles.Core.Interfaces;
 
@@ -21,11 +21,7 @@ public sealed class PlatonicLover : RoleBase, IKiller
             "純愛者",
             "#ff6be4",
             true,
-            countType: CountTypes.Crew,
-            assignInfo: new RoleAssignInfo(CustomRoles.PlatonicLover, CustomRoleTypes.Neutral)
-            {
-                AssignCountRule = new(1, 1, 1)
-            }
+            countType: CountTypes.Crew
         );
     public PlatonicLover(PlayerControl player)
     : base(
@@ -60,51 +56,62 @@ public sealed class PlatonicLover : RoleBase, IKiller
     public override void ApplyGameOptions(IGameOptions opt) => opt.SetVision(false);
     public void OnCheckMurderAsKiller(MurderInfo info)
     {
+        //キル不可
+        info.DoKill = false;
         (var killer, var target) = info.AttemptTuple;
 
+        if (isMadeLover)
+        {
+            return;
+        }
+
         isMadeLover = true;
-        info.DoKill = false;
-        killer.RpcProtectedMurderPlayer(target);
-        target.RpcProtectedMurderPlayer(target);
-        Logger.Info($"{killer.GetNameWithRole()} : 恋人を作った", "PlatonicLover");
 
-        //Main.LoversPlayers.Clear();
-        //Main.isLoversDead = false;
-        killer.RpcSetCustomRole(CustomRoles.Lovers);
-        target.RpcSetCustomRole(CustomRoles.Lovers);
+        //本処理
+        LoversManager.CheckMurderLovers(killer, target);
+        //isMadeLover = true;
+        //info.DoKill = false;
+        //killer.RpcProtectedMurderPlayer(target);
+        //target.RpcProtectedMurderPlayer(target);
+        //Logger.Info($"{killer.GetNameWithRole()} : 恋人を作った", "PlatonicLover");
 
-        List<byte> playerIds = new ();
-        playerIds.Add(killer.PlayerId);
-        Main.isLoversLeaders.Add(killer.PlayerId);
+        //killer.RpcSetCustomRole(CustomRoles.Lovers);
+        //target.RpcSetCustomRole(CustomRoles.Lovers);
 
-        if (CheckOtherLovers(target.PlayerId,out byte teamLeaderId))
-        {
-            Main.LoversPlayersV2[teamLeaderId].Remove(target.PlayerId);
-        }
+        //List<byte> playerIds = new ();
+        //playerIds.Add(killer.PlayerId);
+        //Main.isLoversLeaders.Add(killer.PlayerId);
 
-        playerIds.Add(target.PlayerId);
-        Main.LoversPlayersV2.Add(killer.PlayerId,playerIds);
-        Main.isLoversDeadV2.Add(killer.PlayerId,false);
+        //if (CheckOtherLovers(target.PlayerId,out byte teamLeaderId))
+        //{
+        //    //リーダー
+        //    if (target.PlayerId == teamLeaderId)
+        //    {
+        //        //相手ラバーズチームを自チームに加える
+        //        playerIds.AddRange(Main.LoversPlayersV2[teamLeaderId]);
+        //        //相手ラバーズを削除
+        //        Main.LoversPlayersV2.Remove(teamLeaderId);
+        //        //リーダーとしても削除
+        //        Main.isLoversLeaders.Remove(teamLeaderId);
+        //        Main.isLoversDeadV2.Remove(teamLeaderId);
+        //    }
+        //    //巻き添えの人
+        //    else
+        //    {
+        //        Main.LoversPlayersV2[teamLeaderId].Remove(target.PlayerId);
+        //        playerIds.Add(target.PlayerId);
+        //    }
+        //}
+        //else
+        //{
+        //    playerIds.Add(target.PlayerId);
+        //}
+        //Main.LoversPlayersV2.Add(killer.PlayerId,playerIds);
+        //Main.isLoversDeadV2.Add(killer.PlayerId,false);
 
-        RPC.SyncLoversPlayers();
+        //RPC.SyncLoversPlayers();
 
-        Utils.NotifyRoles();
-    }
-
-    private bool CheckOtherLovers(byte targetId,out byte leader)
-    {
-        leader = byte.MaxValue;
-
-        foreach (var list in Main.LoversPlayersV2)
-        {
-            if (list.Value.Contains(targetId))
-            {
-                leader = list.Key;
-                return true;
-            }
-        }
-
-        return false;
+        //Utils.NotifyRoles();
     }
 
     public bool OverrideKillButtonText(out string text)

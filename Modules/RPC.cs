@@ -97,6 +97,7 @@ namespace TownOfHostForE
             switch (rpcType)
             {
                 case RpcCalls.SetName: //SetNameRPC
+                    subReader.ReadUInt32();
                     string name = subReader.ReadString();
                     if (subReader.BytesRemaining > 0 && subReader.ReadBoolean()) return false;
                     Logger.Info("名前変更:" + __instance.GetNameWithRole() + " => " + name, "SetName");
@@ -195,7 +196,8 @@ namespace TownOfHostForE
                     NameColorManager.ReceiveRPC(reader);
                     break;
                 case CustomRPC.SetLoversPlayers:
-                    Main.LoversPlayersV2.Clear();
+                    LoversManager.LoversMaster.Clear();
+
                     List<byte> lovers = new();
                     int count = reader.ReadInt32();
                     for (int i = 0; i < count; i++)
@@ -208,16 +210,26 @@ namespace TownOfHostForE
                         else
                         {
                             //リストに保管 最初のindexを親とする。
-                            Main.LoversPlayersV2.Add(lovers[0], lovers);
-                            Main.isLoversLeaders.Add(lovers[0]);
+                            LoversManager.LoversMaster.Add( lovers[0],
+                                                                new LoversTeam
+                                                                {
+                                                                    Teams = lovers,
+                                                                    IsDeath = false,
+                                                                    LeaderId = lovers[0]
+                                                                }
+                                                            );
                             //リセット
                             lovers.Clear();
                         }
                     }
                     if (AmongUsClient.Instance.AmHost) break;
-                    foreach (var list in Main.LoversPlayersV2)
+                    foreach (var Data in LoversManager.LoversMaster)
                     {
-                        foreach (var loversId in list.Value)
+                        if (Data.Value.Teams == null)
+                        {
+                            continue;
+                        }
+                        foreach (var loversId in Data.Value.Teams)
                         {
                             var lovePc = Utils.GetPlayerById(loversId);
                             lovePc.RpcSetCustomRole(CustomRoles.Lovers);
@@ -385,9 +397,14 @@ namespace TownOfHostForE
         {
             List<byte> sendData = new();
 
-            foreach (var list in Main.LoversPlayersV2)
+            //foreach (var list in Main.LoversPlayersV2)
+            foreach (var list in LoversManager.LoversMaster)
             {
-                foreach (var id in list.Value)
+                if (list.Value.Teams == null)
+                {
+                    continue;
+                }
+                foreach (var id in list.Value.Teams)
                 {
                     sendData.Add(id);
                 }
@@ -433,7 +450,7 @@ namespace TownOfHostForE
             writer.Write(killerId);
             AmongUsClient.Instance.FinishRpcImmediately(writer);
         }
-        public static void ReportDeadBodyForced(this PlayerControl player, GameData.PlayerInfo target)
+        public static void ReportDeadBodyForced(this PlayerControl player, NetworkedPlayerInfo target)
         {
             //PlayerControl.ReportDeadBodyと同様の処理
             if (!AmongUsClient.Instance.AmHost) return;

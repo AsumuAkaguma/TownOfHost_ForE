@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AmongUs.GameOptions;
-
+using TownOfHostForE.Modules;
 using TownOfHostForE.Roles.Core;
 using UnityEngine;
 using static TownOfHostForE.Translator;
@@ -60,6 +60,14 @@ namespace TownOfHostForE.Roles
         public static Dictionary<CustomRoleTypes, RandomAssignOptions> RandomAssignOptionsCollection = new(CustomRolesHelper.AllRoleTypes.Length);
         private static Dictionary<CustomRoleTypes, int> AssignCount = new(CustomRolesHelper.AllRoleTypes.Length);
         private static List<CustomRoles> AssignRoleList = new(CustomRolesHelper.AllRoles.Length);
+
+        public static void checkAssingList()
+        {
+            foreach (var role in AssignRoleList)
+            {
+                Logger.Info($"{role}","ロール");
+            }
+        }
         public static void SetupOptionItem()
         {
             OptionAssignMode = StringOptionItem.Create(idStart, "AssignMode", AssignModeSelections, 0, TabGroup.MainSettings, false)
@@ -306,7 +314,9 @@ namespace TownOfHostForE.Roles
                 var rnd = IRandom.Instance;
                 for (var i = 0; i < count; i++) //役職の単位数ごとに抽選
                     if (isFixedAssign || rnd.Next(100) < chance)
+                    {
                         AssignRoleList.AddRange(subRole.GetAssignUnitRolesArray());
+                    }
             }
         }
         private static List<CustomRoles> GetCandidateRoleList(int availableRate)
@@ -351,7 +361,8 @@ namespace TownOfHostForE.Roles
             => role.GetRoleAssignInfo()?.AssignUnitRoles ??
             role switch
             {
-                CustomRoles.Lovers => new CustomRoles[2] { CustomRoles.Lovers, CustomRoles.Lovers },
+                //CustomRoles.Lovers => new CustomRoles[2] { CustomRoles.Lovers, CustomRoles.Lovers },
+                CustomRoles.Lovers => LoversManager.SetAssignLovers(),
                 _ => new CustomRoles[1] { role },
             };
         public static bool IsPresent(this CustomRoles role) => AssignRoleList.Any(x => x == role);

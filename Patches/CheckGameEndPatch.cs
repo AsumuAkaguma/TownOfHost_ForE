@@ -13,6 +13,7 @@ using TownOfHostForE.Roles.Crewmate;
 using TownOfHostForE.Roles.Neutral;
 using TownOfHostForE.Roles.Animals;
 using TownOfHostForE.Patches;
+using TownOfHostForE.Modules;
 
 namespace TownOfHostForE
 {
@@ -65,7 +66,7 @@ namespace TownOfHostForE
                 if (CustomWinnerHolder.WinnerTeam is not CustomWinner.Draw and not CustomWinner.None)
                 {
                     List<PlayerControl> winnerLoversList = null;
-                    if(CheckLoversWin(reason,ref winnerLoversList))
+                    if(LoversManager.CheckLoversWin(reason,ref winnerLoversList))
                     {
                         CustomWinnerHolder.ResetAndSetWinner(CustomWinner.Lovers);
                         //Main.AllPlayerControls
@@ -103,9 +104,7 @@ namespace TownOfHostForE
                     foreach (var pc in Main.AllPlayerControls)
                     {
                         //Lover追加勝利
-                        //if (pc.Is(CustomRoles.Lovers) && pc.IsAlive()
-                        //    && (Options.LoversAddWin.GetBool() || PlatonicLover.AddWin))
-                        if(CheckLoversAddWin(pc,winnerLoversList))
+                        if(LoversManager.CheckLoversAddWin(pc,winnerLoversList))
                         {
                             CustomWinnerHolder.WinnerIds.Add(pc.PlayerId);
                             CustomWinnerHolder.AdditionalWinnerRoles.Add(CustomRoles.Lovers);
@@ -156,106 +155,6 @@ namespace TownOfHostForE
             return false;
         }
 
-        private static bool CheckLoversWin(GameOverReason reason, ref List<PlayerControl> winnerLoversList)
-        {
-            winnerLoversList = new();
-            //ラバーズがいないなら処理しない
-            if (Main.LoversPlayersV2 == null || Main.LoversPlayersV2.Count() == 0)return false;
-
-            byte winnerTeamLeaderId = CheckWinnerLoversLeaderID();
-
-            //ラバーズの生き残りがいない場合
-            if (winnerTeamLeaderId == byte.MaxValue) return false;
-
-            //生き残りの1チームなんで選択
-            foreach (var id in Main.LoversPlayersV2[winnerTeamLeaderId])
-            {
-                winnerLoversList.Add(Utils.GetPlayerById(id));
-            }
-
-            //そのチームがラバーズ若しくは純愛者で、追加勝利ありだとここでは処理しない。
-            if (Utils.GetPlayerById(winnerTeamLeaderId).GetCustomRole() != CustomRoles.OtakuPrincess
-                &&
-                ((Utils.GetPlayerById(winnerTeamLeaderId).GetCustomRole() == CustomRoles.PlatonicLover &&
-                 PlatonicLover.AddWin)
-                 ||
-                 (Utils.GetPlayerById(winnerTeamLeaderId).GetCustomSubRoles().All(p => p != CustomRoles.Lovers) == false &&
-                 Options.LoversAddWin.GetBool()))
-                )
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        private static byte CheckWinnerLoversLeaderID()
-        {
-            Dictionary<byte,int> countLovers = new ();
-
-            //生きてる奴確認 登録順で行う
-            foreach (var id in Main.isLoversLeaders)
-            {
-                //trueなら死んでる
-                if (Main.isLoversDeadV2[id]) continue;
-                //生きているなら人数を記録
-                countLovers.Add(id, Main.LoversPlayersV2[id].Count());
-            }
-
-            int maxCount = -1;
-            byte Leader = byte.MaxValue;
-            List<byte> drrowCount = new();
-            //生き残り精査
-            foreach (var data in countLovers)
-            {
-                //相手の人数より多い場合
-                if (data.Value > maxCount)
-                {
-                    maxCount = data.Value;
-                    Leader = data.Key;
-                }
-                //相手の人数と等しい場合
-                else if (data.Value == maxCount)
-                {
-                    drrowCount.Add(data.Key);
-                    if(!drrowCount.Contains(Leader)) drrowCount.Add(Leader);
-                }
-            }
-
-            //最終確認
-            //同じ数のラバーズが勝利条件を満たしているとき
-            if (drrowCount.Count() > 0)
-            {
-                //一番最初に登録されてる奴が勝者
-
-                //なんか0指定で一番最後のラバーズが取れるから取り敢えず一番最後のラバーズを取る
-                Leader = drrowCount[drrowCount.Count() -1];
-            }
-
-            return Leader;
-        }
-
-        private static bool CheckLoversAddWin(PlayerControl pc,List<PlayerControl> winnerLoversList)
-        {
-            //死んでるのは対象外
-            if (!pc.IsAlive()) return false;
-            //対象がいないなら対象外
-            if (winnerLoversList.Any(p => p.PlayerId == pc.PlayerId) == false) return false;
-
-            //欲しいのは代表のロール
-            var cRole = winnerLoversList[0].GetCustomRole();
-            switch (cRole)
-            {
-                case CustomRoles.PlatonicLover:
-                    return PlatonicLover.AddWin;
-                case CustomRoles.Lovers:
-                default:
-                    //代表のロールが純愛者以外であればラバーズの追加勝利から取得
-                    //(姫ちゃんには追加はないので)
-                    return Options.LoversAddWin.GetBool();
-            }
-        }
-
         public static void StartEndGame(GameOverReason reason)
         {
             AmongUsClient.Instance.StartCoroutine(CoEndGame(AmongUsClient.Instance, reason).WrapToIl2Cpp());
@@ -287,7 +186,8 @@ namespace TownOfHostForE
 
                 void SetGhostRole(bool ToGhostImpostor)
                 {
-                    if (!pc.Data.IsDead) ReviveRequiredPlayerIds.Add(pc.PlayerId);
+                    var isDead = pc.Data.IsDead;
+                    if (!isDead) ReviveRequiredPlayerIds.Add(pc.PlayerId);
                     if (ToGhostImpostor)
                     {
                         Logger.Info($"{pc.GetNameWithRole()}: ImpostorGhostに変更", "ResetRoleAndEndGame");
@@ -298,6 +198,8 @@ namespace TownOfHostForE
                         Logger.Info($"{pc.GetNameWithRole()}: CrewmateGhostに変更", "ResetRoleAndEndGame");
                         pc.RpcSetRole(RoleTypes.CrewmateGhost);
                     }
+                    // 蘇生までの遅延の間にオートミュートをかけられないように元に戻しておく
+                    pc.Data.IsDead = isDead;
                 }
             }
 
@@ -319,7 +221,7 @@ namespace TownOfHostForE
                     // 蘇生
                     playerInfo.IsDead = false;
                     // 送信
-                    GameData.Instance.SetDirtyBit(0b_1u << playerId);
+                    playerInfo.MarkDirty();
                     AmongUsClient.Instance.SendAllStreamedObjects();
                 }
                 // ゲーム終了を確実に最後に届けるための遅延

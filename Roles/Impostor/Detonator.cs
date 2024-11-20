@@ -124,7 +124,7 @@ public sealed class Detonator : RoleBase, IImpostor
             InfectInactiveTime += 5f;
     }
 
-    public override bool OnReportDeadBody(PlayerControl reporter, GameData.PlayerInfo target)
+    public override bool OnReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target)
     {
         InfectActive = false;
         return true;

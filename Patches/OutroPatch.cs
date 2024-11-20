@@ -5,12 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using HarmonyLib;
 using UnityEngine;
+using AmongUs;
 
 using TownOfHostForE.Templates;
 using TownOfHostForE.Modules;
 using TownOfHostForE.Roles.Core;
 using static TownOfHostForE.Translator;
-using AmongUs.Data;
 using TMPro;
 
 namespace TownOfHostForE
@@ -51,7 +51,8 @@ namespace TownOfHostForE
 
             Main.NormalOptions.KillCooldown = Options.DefaultKillCooldown;
             //winnerListリセット
-            TempData.winners = new Il2CppSystem.Collections.Generic.List<WinningPlayerData>();
+
+            EndGameResult.CachedWinners = new Il2CppSystem.Collections.Generic.List<CachedPlayerData>();
             var winner = new List<PlayerControl>();
             foreach (var pc in Main.AllPlayerControls)
             {
@@ -117,7 +118,7 @@ namespace TownOfHostForE
             {
                 if (CustomWinnerHolder.WinnerTeam is not CustomWinner.Draw && pc.Is(CustomRoles.GM)) continue;
 
-                TempData.winners.Add(new WinningPlayerData(pc.Data));
+                EndGameResult.CachedWinners.Add(new CachedPlayerData(pc.Data));
                 Main.winnerList.Add(pc.PlayerId);
                 if (BetWinTeams.BetWinTeamMode.GetBool())
                 {

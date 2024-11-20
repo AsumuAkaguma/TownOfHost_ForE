@@ -54,7 +54,7 @@ namespace TownOfHostForE.Roles.Animals
             OptionCanKillAnimals = BooleanOptionItem.Create(RoleInfo, 10, OptionName.MonkeyKillAnimals, true, false);
         }
 
-        public override void OnExileWrapUp(GameData.PlayerInfo exiled, ref bool DecidedWinner)
+        public override void OnExileWrapUp(NetworkedPlayerInfo exiled, ref bool DecidedWinner)
         {
             if (!AmongUsClient.Instance.AmHost) return;
             if (exiled.PlayerId != Player.PlayerId) return;

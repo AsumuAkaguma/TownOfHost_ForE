@@ -26,7 +26,7 @@ namespace TownOfHostForE.Modules
             .ToList().ForEach(sender => sender.SetDirty());
 
         public override IGameOptions BasedGameOptions =>
-            Main.RealOptionsData.Restore(new NormalGameOptionsV07(new UnityLogger().Cast<ILogger>()).Cast<IGameOptions>());
+            Main.RealOptionsData.Restore(new NormalGameOptionsV08(new UnityLogger().Cast<ILogger>()).Cast<IGameOptions>());
         public override bool IsDirty { get; protected set; }
 
         public PlayerControl player;
@@ -96,6 +96,10 @@ namespace TownOfHostForE.Modules
                     if (Options.MadmateCanSeeOtherVotes.GetBool())
                         opt.SetBool(BoolOptionNames.AnonymousVotes, false);
                     break;
+            }
+            if (!role.IsImpostor())
+            {
+                AURoleOptions.NoisemakerImpostorAlert = true;
             }
 
             var roleClass = player.GetRoleClass();

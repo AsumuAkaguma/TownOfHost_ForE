@@ -22,7 +22,7 @@ public static class Guarding
 
     public static void SetupCustomOption()
     {
-        SetupRoleOptions(Id, TabGroup.Addons, CustomRoles.Guarding);
+        SetupRoleOptions(Id, TabGroup.Addons, CustomRoles.Guarding, RoleColor);
     }
     [GameModuleInitializer]
     public static void Init()

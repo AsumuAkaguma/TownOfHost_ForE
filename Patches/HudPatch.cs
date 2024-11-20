@@ -44,12 +44,6 @@ namespace TownOfHostForE
                     player.Collider.offset = new Vector2(0f, -0.3636f);
                 }
             }
-            if (GameStates.IsLobby)
-            {
-                __instance.GameSettings.text = OptionShower.GetText();
-                __instance.GameSettings.fontSizeMin =
-                __instance.GameSettings.fontSizeMax = (TranslationController.Instance.currentLanguage.languageID == SupportedLangs.Japanese || Main.ForceJapanese.Value) ? 1.05f : 1.2f;
-            }
             //ゲーム中でなければ以下は実行されない
             if (!AmongUsClient.Instance.IsGameStarted) return;
 
@@ -196,6 +190,7 @@ namespace TownOfHostForE
             __instance.ReportButton.ToggleVisible(!GameStates.IsLobby && isActive);
             if (!GameStates.IsModHost) return;
             IsActive = isActive;
+            if (GameStates.IsLobby) return;
             if (!isActive) return;
 
             var player = PlayerControl.LocalPlayer;
@@ -255,6 +250,7 @@ namespace TownOfHostForE
         // タスク表示の文章が更新・適用された後に実行される
         public static void Postfix(TaskPanelBehaviour __instance)
         {
+            if (GameStates.IsLobby) return;
             if (!GameStates.IsModHost) return;
             PlayerControl player = PlayerControl.LocalPlayer;
 

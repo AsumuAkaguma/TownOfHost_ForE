@@ -57,7 +57,7 @@ public sealed class Chairman : RoleBase
             : opt.GetInt(Int32OptionNames.EmergencyCooldown);
         AURoleOptions.EngineerInVentMaxTime = 1;
     }
-    public override bool OnReportDeadBody(PlayerControl reporter, GameData.PlayerInfo target)
+    public override bool OnReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target)
     {
         if (reporter == Player && target == null) //ボタン
             LeftButtonCount--;

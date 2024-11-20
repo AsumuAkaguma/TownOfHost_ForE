@@ -265,9 +265,9 @@ public static class MeetingHudPatch
                     switch (subRole)
                     {
                         case CustomRoles.Lovers:
-                            //if (seer.Is(CustomRoles.Lovers) || seer.Data.IsDead)
-                            if (Utils.CheckMyLovers(seer.PlayerId,target.PlayerId) || seer.Data.IsDead)
-                                sb.Append(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Lovers), "♥"));
+                            if (LoversManager.CheckMyLovers(seer.PlayerId,target.PlayerId) || seer.Data.IsDead)
+                                //sb.Append(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Lovers), "♥"));
+                                sb.Append(Utils.ColorString(LoversManager.GetLeaderColor(target.PlayerId), "♥"));
                             break;
                     }
                 }
@@ -373,42 +373,13 @@ public static class MeetingHudPatch
         {
             //Loversの後追い
             //if ((CustomRoles.Lovers.IsPresent() || CustomRoles.PlatonicLover.IsPresent() || CustomRoles.OtakuPrincess.IsPresent()) && !Main.isLoversDead && Main.LoversPlayers.Find(lp => lp.PlayerId == playerId) != null)
-            if(CheckLoversSuicide(playerId))
-                FixedUpdatePatch.LoversSuicide(playerId, true);
+            if(LoversManager.CheckLoversSuicide(playerId))
+                LoversManager.LoversSuicide(playerId, true);
             //道連れチェック
             RevengeOnExile(playerId, deathReason);
         }
     }
 
-    private static bool CheckLoversSuicide(byte playerId)
-    {
-        //ラバーズ系がいない
-        if (!(CustomRoles.Lovers.IsPresent() || CustomRoles.PlatonicLover.IsPresent() || CustomRoles.OtakuPrincess.IsPresent()))
-             return false;
-
-        byte ownerId = byte.MaxValue;
-
-        foreach (var list in Main.LoversPlayersV2)
-        {
-            foreach (var id in list.Value)
-            {
-                if (id == playerId)
-                {
-                    ownerId = list.Key;
-                    break;
-                }
-            }
-            if (ownerId != byte.MaxValue)
-                break;
-        }
-
-        //ラバーズに所属していないなら抜ける
-        if (ownerId == byte.MaxValue)
-            return false;
-
-
-        return !Main.isLoversDeadV2[ownerId];
-    }
 
     //道連れ
     public static List<(PlayerControl, PlayerControl)> RevengeTargetPlayer;

@@ -147,7 +147,9 @@ namespace TownOfHostForE
             if(!onlyCheck) return true;
 
             //skip投票
-            if(voted == null)
+            if (voted == null)
+            ////自投票
+            //if(voted == voter)
             {
                 //チャット登録済みなら
                 if (ChatDatas.ContainsKey(voter.PlayerId))
@@ -460,7 +462,6 @@ namespace TownOfHostForE
             }
             if (PageDatas[voterId][nowPage].Count() <= picNum)
             {
-                Logger.Info($"指定異常:{PageDatas[voterId][nowPage].Count()}/{picNum}", "debug");
                 return false;
             }
             //選ばれたやつ

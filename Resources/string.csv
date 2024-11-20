@@ -58,7 +58,8 @@ Teleporter,Teleporter,テレポーター,传送者
 JapPup,Magic Puppeteer,人形術師,木偶師
 Eraser,Eraser,イレイサー,橡皮
 Detonator,Detonator,デトネーター,Detonator
-EvilBalancer,DogSheriff,服従の天秤,DogSheriff
+EvilBalancer,EvilBalancer,服従の天秤,EvilBalancer
+RemoteCharger,RemoteCharger,リモートチャージャー,RemoteCharger
 
 ## Imposter役職説明ショート
 SuicideBomberInfo,Involve a lot of crew and try to self-destruct,多くのクルーを吹っ飛ばしてやろうぜ！,让很多船员参与并尝试自毁
@@ -70,6 +71,7 @@ TalktiveInfo,Words are cleverly concealed.,言葉は巧妙に隠すもの,文字
 "EraserInfo","you don't have that ability.",君にそんな能力はない,"你沒有那個能力"
 "DetonatorInfo","everything is in my hands.",全ては我が手中にあるのだよ,"一切都在我們手中"
 "EvilBalancerInfo","my pal has a keen sense of smell",私は500年以上生きた大インポスターだ！,"我的朋友嗅覺很敏銳"
+"RemoteChargerInfo","The battle begins when it accumulates",溜まってきたところで勝負さ,"戰鬥在累積時開始"
 
 ## Imposter役職説明ロング
 SuicideBomberInfoLong,"(Impostors)\nSelf-destruct by transforming. It might be fun to do it in a place where many people are nearby.",[インポスター陣営]\n我が名は爆裂魔！ この船を破壊しもの！！\n変身することで周囲を巻き込んで大爆発する。\n爆発後は力が抜けて動けないしキルする力もない。\nやってもいいけどやり返されるだろうよ。,"(内鬼阵营)\n通过变形自毁  在附近有很多人的地方做这件事可能会很有趣"言葉は巧妙に隠すもの
@@ -78,9 +80,11 @@ CinderellaInfoLong,"(Impostors)\nThe real power comes after the transformation. 
 TalktiveInfoLong,"(Impostors)\nSpeak the subject words well during the meeting. You'll be able to kill cool faster during the turn.",[インポスター陣営]\n会議中にお題の言葉を上手く喋ろう。そのターン中キルクールが早くなるぞ。,"(内鬼阵营)\n在会议上好好说主题词。 在这个回合中、你的 killcool 速度会更快。"
 "TeleporterInfoLong","(Impostors):\nTransformation can be used to set up gates. Two gates can be connected by placing one on top of the other, and only the imposter can go to warp by climbing on the gate.",[インポスター陣営]\n変身することでゲートを設置できる。ゲートは二つ設置することで繋がり、インポスターのみがそのゲートに乗っかることでワープすることが出来る。,"(内鬼阵营):\n变形可以安装大门。 可以将两扇门连接起来，只有冒牌货才能在上面翘起。"
 "JapPupInfoLong","(Impostors):\nTransforming and performing a kill turns the target of the kill into a doll. The opponent who has been transformed into a doll will die if he does not meet the target of the transformation within a certain period of time.",[インポスター陣営]\n変身してキルを行うことでキルの対象を人形に変える。人形に変えられた相手は一定時間以内に変身対象に出会わないと死んでしまう。,"(内鬼阵营):\n变身并实施击杀后，击杀目标会变成玩偶。 被变成玩偶的对手如果在一定时间内没有遇到变身目标，就会死亡。"
-"EraserInfoLong","(Impostors):\nBy transforming, you can decide who you want to be your crewmate, and then passing by that person will confirm the activation of your abilities. At the end of the meeting after confirmation, the other party's position becomes crewmate.",[インポスター陣営]\n変身することでクルーメイトにしたい相手を決定し、その後その相手とすれ違うことで能力の発動が確定される。確定後の会議終了時に相手の役職がクルーメイトになる。,"(内鬼阵营):\n通過變身，你可以決定你想要誰成為你的隊友，然後經過那個人就會確認你的能力激活。 會議結束確認後，對方的位置變為船員。"
+"EraserInfoLong","(Impostors):\nPressing the Transform button will target the closest player within kill range. At the end of the meeting after setting, the other party's role becomes crewmate.",[インポスター陣営]\n変身ボタンを押すことでキル範囲内の一番近いプレイヤーをターゲットに設定する。設定後の会議終了時に相手の役職がクルーメイトになる。,"(内鬼阵营):\n按下變換按鈕將瞄準殺傷範圍內最近的玩家。會議結束後，對方的角色變成了船員。"
 "DetonatorInfoLong","(Impostors):\nYou can place a radar on any player you like. \nYou can learn the roles of players who have been near the player with the radar attached for a certain period of time. \nAlso, you can kill the player whose radar is attached by transforming at any time after installing the radar. \n\n[Operation method]\n-Before installation-\n・Normal kill: Radar installation\n・Kill button double click: Normal kill\n\n-After installation-\n・Normal kill: Normal kill\ n・Transformation: Kill the opponent with radar installed",[インポスター陣営]\n好きなプレイヤーにレーダーを設置することが出来る。\nレーダーが取りつけられたプレイヤーの近くに一定時間いたプレイヤーの役職を知ることが出来る。\nまた、レーダー設置後に任意のタイミングで変身することでレーダーのついたプレイヤーをキルすることが出来る。\n\n【操作方法】\n-設置前-\n・通常キル：レーダーの設置\n・キルボタンダブルクリック：通常キル\n\n-設置後-\n・通常キル：通常キル\n・変身：レーダー設置相手のキル,"(内鬼阵营):\n您可以在任何您喜歡的玩家身上放置雷達。 \n您可以了解靠近安裝雷達的玩家一定時間的玩家的角色。 \n此外，安裝雷達後，您可以隨時透過變身殺死安裝了雷達的玩家。 \n\n[操作方法]\n-安裝前-\n・正常查殺：雷達安裝\n・查殺按鈕雙擊：正常查殺\n\n-安裝後-\n・正常查殺：正常查殺\n・變身：安裝雷達殺死對手"
-"EvilBalancerInfoLong","(Crewmates):\nKCompare the number of tasks completed or kills by voting for yourself and then voting for any opponent. Players with low results are killed. The number of kills is calculated using the multiplier you set.",[インポスター陣営]\n自投票後に任意の相手に投票することでタスク消化数もしくはキル数を比較する。結果が低いプレイヤーはキルされる。キル数は設定する倍率をもって計算される。,"(船员阵营):\n透過投票給自己然後投票給任何對手來比較完成的任務或殺死的數量。 成績低的玩家會被殺死。 擊殺數是使用您設定的乘數計算的。"
+"EvilBalancerInfoLong","(Imposters):\nCompare the number of tasks completed or kills by voting for yourself and then voting for any opponent. Players with low results are killed. The number of kills is calculated using the multiplier you set.",[インポスター陣営]\n自投票後に任意の相手に投票することでタスク消化数もしくはキル数を比較する。結果が低いプレイヤーはキルされる。キル数は設定する倍率をもって計算される。,"((内鬼阵营):\n透過投票給自己然後投票給任何對手來比較完成的任務或殺死的數量。 成績低的玩家會被殺死。 擊殺數是使用您設定的乘數計算的。"
+"RemoteChargerInfoLong","(Impostors):\nIf you enter a meeting without making a kill, you will be charged. Kill cool decreases by a set number of seconds per charge. Charges are consumed each time you kill. Up to 3 charges",[インポスター陣営]\nキルを行わずに会議に入った場合チャージが行われる。1チャージにつきキルクールが設定秒数下がる。チャージはキルする度に消費する。最大3チャージまで,"(内鬼阵营):\n如果您在沒有殺人的情況下進入會議，您將被指控。 每次充電，Kill Cool 都會減少一定的秒數。 每次擊殺都會消耗費用。 最多 3 次收費"
+
 
 ## Neutral
 OtakuPrincess,Princess,姫,姫
@@ -286,6 +290,8 @@ NyaohaFireDelay,CoolTime,クールタイム,冷靜時間
 "ChickenButtonCoolDown","Button cooldown","ボタンのクールダウン",按鈕冷卻時間
 "DolphinLimit","Number of ability activations","能力発動回数",能力啟動次數
 "MonkeyKillAnimals","Kill Animals too","アニマルズもキルする",也殺動物
+"ChargerMinusCool","Kill cool reduction per charge","1チャージ当たりのキルクール減少量",每次充電殺死冷卻減少
+"MakeLoversPair","Number of pairs","ペア数",對數
 
 ##トークティブ辞書
 "Talktive1","","インポスター",""
@@ -900,6 +906,7 @@ GhostCanSeeOtherTasks,"Ghosts Can't See Other Tasks","幽霊が他人のタス�
 "ApplyDenyNameList","Apply DenyName List","DenyNameリストを適用する","启用违禁昵称名单","","Применить файл запрещённых имён (DenyName)",""
 "KickPlayerFriendCodeNotExist","Kick Players Whose Friend Code Does Not Exist","フレンドコードが存在しないプレイヤーをキックする","踢出好友编号无效的玩家","","Кикнуть игроков у которых нет Кода Друга",""
 "ApplyBanList","Apply BanList","BANリストを適用する","启用封禁名单","","Применить файл с забаненными игроками (BanList)",""
+"FixSpawnPacketSize","(Experimental) Only if disconnection occurs with above 8 people.","(試験的機能) 8人以上で切断が発生する場合のみオンにするときっと嬉しい"
 "ShowReportReason","Show button or report","ボタンかレポートか表示させる","显示按钮或报告"
 "ShowRevengeTarget","Show Revenge player at Meeting","道連れされた人を会議で表示する","在会议上显示复仇玩家"
 "ShowRoleInfoAtFirstMeeting","Show Role description at the first meeting","初めの会議で役職説明を表示する","在第一次会议上显示角色介绍"
@@ -1214,6 +1221,10 @@ GhostCanSeeOtherTasks,"Ghosts Can't See Other Tasks","幽霊が他人のタス�
 "PolusReactorTimeLimit","Polus Reactor Duration","ポーラスのリアクター制限時間","波鲁斯抗震稳定器修理时限","Polus地震抑制器破壞最大時間","Polus время саботажа Реактора","Duração do Reator em Polus"
 "AirshipReactorTimeLimit","Airship Reactor Duration","エアシップのリアクター制限時間","飞艇坠毁路线修理时限","Airship間隙室破壞最大時間","Airship время саботажа Реактора","Duração do Reator em Airship"
 
+"## ゲーム設定UI"
+"TOHSettingsButtonLabel","TOH Settings","TOH4E設定",""
+"TOHSettingsDescription","Edit mod settings for your game lobby.","Modの設定を編集出来たり\r\n出来なかったり\r\n(´；ω；｀)。",""
+
 "## クライアント設定"
 "Close","Close","閉じる","","","",""
 "TOHOptions","<color=#18e744>TOH4E</color> Options","<color=#18e744>TOH4E</color>の設定","","","",""
@@ -1337,6 +1348,8 @@ PanAlive13,\nBread was served by the bakery.\nㅤ,\nパン屋は{0}に向けて�
 "TabGroup.CrewmateRoles","Crewmate Roles","クルー役職","船员阵营职业","","Роли Членов Экипажа","Classes de Tripulante"
 "TabGroup.NeutralRoles","Neutral Roles","ニュートラル役職","独立阵营职业","中立職業設定","Нейтральные Роли","Classes Neutras"
 "TabGroup.ImpostorRoles","Impostor Roles","インポスター役職","内鬼阵营职业","偽裝者職業設定","Роли Предателей","Classes de Impostor"
+"TabGroup.AnimalsRoles","AnimalsRoles Roles","アニマルズ役職","","","",""
+"TabGroup.MadmateRoles","Madmate Roles","マッドメイト役職","","","",""
 "TabGroup.Addons","Add-Ons","属性","附加效果","副職業設定","Атрибуты","Atributos"
 "ActiveRolesList","Active Roles List","有効な役職一覧","有效职业一览","已開啟職業列表","Список Активных Ролей","Lista de Classes Ativas"
 "ForExample","Example Use","使用例","使用例子","使用例子","Например","Exemplo de Uso"
@@ -1366,6 +1379,7 @@ PanAlive13,\nBread was served by the bakery.\nㅤ,\nパン屋は{0}に向けて�
 "FireworksReadyFirePhase","Fire!","打ち上げろ！","烟花来咯，大型烟花秀开始！","準備就緒，煙火秀開始!","Огонь!","Lançar!"
 "StandardHAS","Hide And Seek with Roles","役職入りでかくれんぼ","在躲猫猫模式中加入职业","在躲貓貓中加入多職業模式中的職業","Прятки с Ролями","Esconde-Esconde com Classes"
 "StandardHASWaitingTime","Standby","待機時間","躲猫猫猎人等待时间","躲貓貓偽裝者等待時間","Время ожидания","Tempo de Espera"
+"Prerelease","Pre-release","デバッグBAN",""
 "InvalidArgs","Invalid Args","無効な引数","无效参数","無效的參數","Недопустимые Аргументы","Argumento Inválido"
 "On","ON","オン","开启","開啟","ВКЛ","Ativado"
 "Off","OFF","オフ","关闭","關閉","ВЫКЛ","Desativado"

@@ -36,7 +36,7 @@ namespace TownOfHostForE
     {
         public static bool Prefix(PlayerControl pc, uint taskId)
         {
-            GameData.TaskInfo taskById = pc.Data.FindTaskById(taskId);
+            NetworkedPlayerInfo.TaskInfo taskById = pc.Data.FindTaskById(taskId);
             if (taskById != null)
             {
                 if (!taskById.Complete)

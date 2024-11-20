@@ -11,11 +11,13 @@ using TownOfHostForE.Roles.AddOns.Common;
 using TownOfHostForE.Roles.Impostor;
 using TownOfHostForE.Roles.Crewmate;
 
+using TownOfHostForE.Modules;
 using TownOfHostForE.Attributes;
 using TownOfHostForE.Roles.Animals;
 using TownOfHostForE.Roles.AddOns.NotCrew;
 using TownOfHostForE.GameMode;
 using TownOfHostForE.Roles.Neutral;
+using TownOfHostForE.Roles.Core.Class;
 
 namespace TownOfHostForE.Roles.Core;
 
@@ -27,6 +29,7 @@ public static class CustomRoleManager
 
     public static SimpleRoleInfo GetRoleInfo(this CustomRoles role) => AllRolesInfo.ContainsKey(role) ? AllRolesInfo[role] : null;
     public static RoleBase GetRoleClass(this PlayerControl player) => GetByPlayerId(player.PlayerId);
+    public static ShapeSwitchManager GetShapeSwitchClass(this PlayerControl player) => (ShapeSwitchManager)GetByPlayerId(player.PlayerId);
     public static RoleBase GetByPlayerId(byte playerId) => AllActiveRoles.TryGetValue(playerId, out var roleBase) ? roleBase : null;
     public static void Do<T>(this List<T> list, Action<T> action) => list.ToArray().Do(action);
     // == CheckMurder関連処理 ==
@@ -155,7 +158,7 @@ public static class CustomRoleManager
         AddBait.OnMurderPlayer(info);
 
         //サブロール処理ができるまではラバーズをここで処理
-        FixedUpdatePatch.LoversSuicide(attemptTarget.PlayerId);
+        LoversManager.LoversSuicide(attemptTarget.PlayerId);
 
         //以降共通処理
         var targetState = PlayerState.GetByPlayerId(attemptTarget.PlayerId);
@@ -168,16 +171,6 @@ public static class CustomRoleManager
         targetState.SetDead();
         attemptTarget.SetRealKiller(attemptKiller, true);
 
-        //Logger.Info("キル", "debug");
-        ////キルカウント
-        //if (Main.killCount.ContainsKey(attemptKiller.PlayerId))
-        //{
-        //    Main.killCount[attemptKiller.PlayerId]++;
-        //}
-        //else
-        //{
-        //    Main.killCount.Add(attemptKiller.PlayerId,0);
-        //}
 
         Utils.CountAlivePlayers(true);
 
@@ -453,6 +446,7 @@ public enum CustomRoles
     //Impostor(Vanilla)
     Impostor,
     Shapeshifter,
+    Phantom,
     //Impostor
     NormalImpostor,
     NormalShapeshifter,
@@ -494,6 +488,7 @@ public enum CustomRoles
     Eraser,
     Detonator,
     EvilBalancer,
+    RemoteCharger,
     //Madmate
     MadGuardian,
     Madmate,
@@ -512,6 +507,8 @@ public enum CustomRoles
     Engineer,
     GuardianAngel,
     Scientist,
+    Tracker,
+    Noisemaker,
     //Crewmate
     NormalEngineer,
     NormalScientist,

@@ -66,5 +66,10 @@ namespace TownOfHostForE
             get => Opt.GetBool(BoolOptionNames.ShapeshifterLeaveSkin);
             set => Opt.SetBool(BoolOptionNames.ShapeshifterLeaveSkin, value);
         }
+        public static bool NoisemakerImpostorAlert
+        {
+            get => Opt.GetBool(BoolOptionNames.NoisemakerImpostorAlert);
+            set => Opt.SetBool(BoolOptionNames.NoisemakerImpostorAlert, value);
+        }
     }
 }

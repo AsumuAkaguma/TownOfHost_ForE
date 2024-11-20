@@ -84,7 +84,7 @@ namespace TownOfHostForE.Roles.Impostor
                 }
             }
         }
-        public override bool OnReportDeadBody(PlayerControl _, GameData.PlayerInfo __)
+        public override bool OnReportDeadBody(PlayerControl _, NetworkedPlayerInfo __)
         {
             foreach (var targetId in BittenPlayers.Keys)
             {

@@ -52,21 +52,43 @@ namespace TownOfHostForE
         // ==========
         //Sorry for many Japanese comments.
         public const string PluginGuid = "com.AsumuAkaguma.townofhostfore";
-        public const string PluginVersion = "516.4.0";
-        public const string PleviewPluginVersion = "Commemorative";
+        public const string PluginVersion = "517.4.0.2";
+        public const string PleviewPluginVersion = "Commemorative-αγ";
         // サポートされている最低のAmongUsバージョン
-        public static readonly string LowestSupportedVersion = "2024.03.05";
+        public static readonly string LowestSupportedVersion = "2024.06.18";
         // このバージョンのみで公開ルームを無効にする場合
         public static readonly bool IsPublicAvailableOnThisVersion = false;
+        // プレリリースかどうか
+        public static bool IsPrerelease { get; } = true;
         public Harmony Harmony { get; } = new Harmony(PluginGuid);
         public static Version version = Version.Parse(PluginVersion);
+        public static Color UnityModColor
+        {
+            get
+            {
+                if (!_unityModColor.HasValue)
+                {
+                    if (ColorUtility.TryParseHtmlString(ModColor, out var unityColor))
+                    {
+                        _unityModColor = unityColor;
+                    }
+                    else
+                    {
+                        // failure
+                        return Color.gray;
+                    }
+                }
+                return _unityModColor.Value;
+            }
+        }
+        private static Color? _unityModColor;
         public static BepInEx.Logging.ManualLogSource Logger;
         public static bool hasArgumentException = false;
         public static string ExceptionMessage;
         public static bool ExceptionMessageIsShown = false;
         public static string credentialsText;
-        public static NormalGameOptionsV07 NormalOptions => GameOptionsManager.Instance.currentNormalGameOptions;
-        public static HideNSeekGameOptionsV07 HideNSeekSOptions => GameOptionsManager.Instance.currentHideNSeekGameOptions;
+        public static NormalGameOptionsV08 NormalOptions => GameOptionsManager.Instance.currentNormalGameOptions;
+        public static HideNSeekGameOptionsV08 HideNSeekSOptions => GameOptionsManager.Instance.currentHideNSeekGameOptions;
         //Client Options
         public static ConfigEntry<string> HideName { get; private set; }
         public static ConfigEntry<string> HideColor { get; private set; }
@@ -101,16 +123,10 @@ namespace TownOfHostForE
         public static bool isChatCommand = false;
         public static Dictionary<byte, float> AllPlayerKillCooldown = new();
         public static List<PlayerControl> NotCrewAssignCount = new();
-        //public static List<PlayerControl> LoversPlayers = new();
-        //複数ラバーズ制作用。keyはラバーズ親のPlayerId
-        public static Dictionary<byte ,List<byte>> LoversPlayersV2 = new();
-        //public static bool isLoversDead = true;
-        //複数ラバーズ制作用。keyはラバーズ親のPlayerId
-        public static Dictionary<byte,bool> isLoversDeadV2;
-        //複数ラバーズ制作用。リーダーの登録順保持用
-        public static List<byte> isLoversLeaders;
         //プレイヤーのキルカウント数
         public static Dictionary<byte, int> killCount = new();
+        //シェイプをボタンにしてる人のID
+        public static HashSet<byte> shapeSwitchPlayerIds = new HashSet<byte>();
 
         /// <summary>
         /// 基本的に速度の代入は禁止.スピードは増減で対応してください.
@@ -131,7 +147,7 @@ namespace TownOfHostForE
         public static bool IsAprilFool = DateTime.Now.Month == 4 && DateTime.Now.Day is 1 or 2 or 3;
         public static bool IsInitialRelease = DateTime.Now.Month == 11 && DateTime.Now.Day is 2;
         public static bool IsOneNightRelease = DateTime.Now.Month == 7;
-        public static bool IsForEPreRelease = DateTime.Now.Month == 4;
+        public static bool IsForEPreRelease = true;
         public static bool IsForEDay = DateTime.Now.Month == 4 || DateTime.Now.Day is 4 or 14 or 24;
         public const float RoleTextSize = 2f;
 

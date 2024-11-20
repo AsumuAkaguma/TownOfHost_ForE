@@ -330,7 +330,7 @@ public class MeetingVoteManager
         /// <summary>
         /// 追放されるプレイヤー
         /// </summary>
-        public readonly GameData.PlayerInfo Exiled;
+        public readonly NetworkedPlayerInfo Exiled;
         /// <summary>
         /// 同数投票かどうか
         /// </summary>

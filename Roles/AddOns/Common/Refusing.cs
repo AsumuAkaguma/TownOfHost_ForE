@@ -16,7 +16,7 @@ public static class Refusing
 
     public static void SetupCustomOption()
     {
-        SetupRoleOptions(Id, TabGroup.Addons, CustomRoles.Refusing);
+        SetupRoleOptions(Id, TabGroup.Addons, CustomRoles.Refusing, RoleColor);
     }
     [GameModuleInitializer]
     public static void Init()
@@ -31,7 +31,7 @@ public static class Refusing
         if (!IgnoreExiled.Contains(playerId))
             IgnoreExiled.Add(playerId);
     }
-    public static GameData.PlayerInfo VoteChange(GameData.PlayerInfo Exiled)
+    public static NetworkedPlayerInfo VoteChange(NetworkedPlayerInfo Exiled)
     {
         if (Exiled == null || !IgnoreExiled.Contains(Exiled.PlayerId)) return Exiled;
 

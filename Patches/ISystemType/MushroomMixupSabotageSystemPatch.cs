@@ -1,5 +1,9 @@
 using HarmonyLib;
 using Hazel;
+using TownOfHostForE.Roles.Core;
+using static UnityEngine.GraphicsBuffer;
+using TownOfHostForE.Roles.Vanilla;
+using System;
 
 namespace TownOfHostForE.Patches.ISystemType;
 
@@ -36,11 +40,31 @@ public static class MushroomMixupSabotageSystemDeterioratePatch
     }
     public static void Postfix(MushroomMixupSabotageSystem __instance, bool __state)
     {
+
         // 本体処理でIsActiveが変わった場合
         if (__instance.IsActive != __state)
         {
             // Desyncインポスター目線のプレイヤー名の表示/非表示を反映
             Utils.NotifyRoles(ForceLoop: true);
+
+            if (!__instance.IsActive)
+            {
+                _ = new LateTask(() =>
+                {
+                    //ワンクリックを使う人のシェイプをリセット
+                    Main.AllPlayerControls.Do(pc =>
+                    {
+                        try
+                        {
+                            pc.GetShapeSwitchClass()?.MushResetShape();
+                        }
+                        catch(InvalidCastException)
+                        {
+                            //キャスト例外は握りつぶす
+                        }
+                    });
+                }, 1.1f);
+            }
         }
     }
 }

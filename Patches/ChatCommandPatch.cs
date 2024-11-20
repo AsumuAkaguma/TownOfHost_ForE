@@ -847,12 +847,14 @@ namespace TownOfHostForE
             var writer = CustomRpcSender.Create("MessagesToSend", SendOption.None);
             writer.StartMessage(clientId);
             writer.StartRpc(player.NetId, (byte)RpcCalls.SetName)
+                .Write(player.Data.NetId)
                 .Write(title)
                 .EndRpc();
             writer.StartRpc(player.NetId, (byte)RpcCalls.SendChat)
                 .Write(msg)
                 .EndRpc();
             writer.StartRpc(player.NetId, (byte)RpcCalls.SetName)
+                .Write(player.Data.NetId)
                 .Write(player.Data.PlayerName)
                 .EndRpc();
             writer.EndMessage();
@@ -888,7 +890,7 @@ namespace TownOfHostForE
             chatText = new StringBuilder(chatText).Insert(0, "\n", return_count).ToString();
             if (AmongUsClient.Instance.AmClient && DestroyableSingleton<HudManager>.Instance)
                 DestroyableSingleton<HudManager>.Instance.Chat.AddChat(__instance, chatText);
-            if (chatText.IndexOf("who", StringComparison.OrdinalIgnoreCase) >= 0)
+            if (chatText.Contains("who", StringComparison.OrdinalIgnoreCase))
                 DestroyableSingleton<UnityTelemetry>.Instance.SendWho();
             MessageWriter messageWriter = AmongUsClient.Instance.StartRpc(__instance.NetId, (byte)RpcCalls.SendChat, SendOption.None);
             messageWriter.Write(chatText);

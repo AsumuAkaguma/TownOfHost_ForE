@@ -76,7 +76,7 @@ public sealed class Puppeteer : RoleBase, IImpostor
         Utils.NotifyRoles(SpecifySeer: puppeteer);
         info.DoKill = false;
     }
-    public override bool OnReportDeadBody(PlayerControl _, GameData.PlayerInfo __)
+    public override bool OnReportDeadBody(PlayerControl _, NetworkedPlayerInfo __)
     {
         Puppets.Clear();
         SendRPC(byte.MaxValue, 0);
@@ -112,7 +112,7 @@ public sealed class Puppeteer : RoleBase, IImpostor
 
             var min = targetDistance.OrderBy(c => c.Value).FirstOrDefault();//一番値が小さい
             var target = min.Key;
-            var KillRange = NormalGameOptionsV07.KillDistances[Mathf.Clamp(Main.NormalOptions.KillDistance, 0, 2)];
+            var KillRange = NormalGameOptionsV08.KillDistances[Mathf.Clamp(Main.NormalOptions.KillDistance, 0, 2)];
             if (min.Value <= KillRange && puppet.CanMove && target.CanMove)
             {
                 RPC.PlaySoundRPC(Player.PlayerId, Sounds.KillSound);

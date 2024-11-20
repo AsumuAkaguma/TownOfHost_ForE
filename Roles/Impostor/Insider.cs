@@ -4,6 +4,7 @@ using AmongUs.GameOptions;
 
 using TownOfHostForE.Roles.Core;
 using TownOfHostForE.Roles.Core.Interfaces;
+using TownOfHostForE.Modules;
 
 namespace TownOfHostForE.Roles.Impostor
 {
@@ -116,7 +117,8 @@ namespace TownOfHostForE.Roles.Impostor
 
             // 死亡したLoversのマーク追加
             if (seen.Is(CustomRoles.Lovers) && !seer.Is(CustomRoles.Lovers) && KnowDeadRole(seen))
-                mark.Append(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Lovers), "♡"));
+                //mark.Append(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Lovers), "♡"));
+                mark.Append(Utils.ColorString(LoversManager.GetLeaderColor(seen.PlayerId), "♡"));
 
             if (canSeeImpostorAbilities)
             {

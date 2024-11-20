@@ -15,7 +15,7 @@ public static class InfoPoor
 
     public static void SetupCustomOption()
     {
-        SetupRoleOptions(Id, TabGroup.Addons, CustomRoles.InfoPoor);
+        SetupRoleOptions(Id, TabGroup.Addons, CustomRoles.InfoPoor, RoleColor);
     }
     [GameModuleInitializer]
     public static void Init()

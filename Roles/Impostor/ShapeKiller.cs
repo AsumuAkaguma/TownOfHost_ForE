@@ -49,7 +49,7 @@ public sealed class ShapeKiller : RoleBase, IImpostor, ISidekickable
         else ShapeTarget = target;
         Logger.Info($"{Player.GetNameWithRole()}のターゲットを {target?.GetNameWithRole()} に設定", "ShepeKillerTarget");
     }
-    public static bool DummyReportDeadBody(PlayerControl reporter, GameData.PlayerInfo target)
+    public static bool DummyReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target)
     {
         if (target == null) return false;
         if (reporter == null || !reporter.Is(CustomRoles.ShapeKiller)) return false;

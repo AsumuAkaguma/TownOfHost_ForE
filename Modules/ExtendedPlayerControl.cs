@@ -79,7 +79,7 @@ namespace TownOfHostForE
             var client = player.GetClient();
             return client == null ? -1 : client.Id;
         }
-        public static CustomRoles GetCustomRole(this GameData.PlayerInfo player)
+        public static CustomRoles GetCustomRole(this NetworkedPlayerInfo player)
         {
             return player == null || player.Object == null ? CustomRoles.Crewmate : player.Object.GetCustomRole();
         }
@@ -153,15 +153,26 @@ namespace TownOfHostForE
             //Logger.Info($"Set:{player?.Data?.PlayerName}:{name.RemoveHtmlTags()} for {seer.GetNameWithRole()}", "RpcSetNamePrivate");
             var clientId = seer.GetClientId();
             MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(player.NetId, (byte)RpcCalls.SetName, Hazel.SendOption.Reliable, clientId);
+            writer.Write(player.Data.NetId);
             writer.Write(name);
             writer.Write(DontShowOnModdedClient);
             AmongUsClient.Instance.FinishRpcImmediately(writer);
         }
 
-        public static void RpcSetNamePrivateSingle(this PlayerControl seer,string name, bool DontShowOnModdedClient = false)
+        public static void RpcSetNamePrivateSingle(this PlayerControl seer, string name, bool DontShowOnModdedClient = false)
         {
             var clientId = seer.GetClientId();
             MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(seer.NetId, (byte)RpcCalls.SetName, Hazel.SendOption.Reliable, clientId);
+            writer.Write(name);
+            writer.Write(DontShowOnModdedClient);
+            AmongUsClient.Instance.FinishRpcImmediately(writer);
+        }
+        public static void RpcSetNamePrivateSingle(this PlayerControl Player, string name, bool DontShowOnModdedClient = false,PlayerControl seer = null)
+        {
+            if (!AmongUsClient.Instance.AmHost) return;
+            if (seer == null) seer = Player;
+            var clientId = seer.GetClientId();
+            MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(Player.NetId, (byte)RpcCalls.SetName, Hazel.SendOption.Reliable, clientId);
             writer.Write(name);
             writer.Write(DontShowOnModdedClient);
             AmongUsClient.Instance.FinishRpcImmediately(writer);
@@ -174,11 +185,12 @@ namespace TownOfHostForE
             if (player == null) return;
             if (AmongUsClient.Instance.ClientId == clientId)
             {
-                player.SetRole(role);
+                player.StartCoroutine(player.CoSetRole(role, false));
                 return;
             }
             MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(player.NetId, (byte)RpcCalls.SetRole, Hazel.SendOption.Reliable, clientId);
             writer.Write((ushort)role);
+            writer.Write(false);
             AmongUsClient.Instance.FinishRpcImmediately(writer);
         }
 
@@ -525,13 +537,6 @@ namespace TownOfHostForE
             {
                 killer.RpcMurderPlayer(target, true);
             }
-
-            //if (DarkGameMaster.IsDeathGameTime && DarkGameMaster.deathGameJoinPlayerIds[DarkGameMaster.IsDeathGameOwner].Contains(target.PlayerId))
-            //{
-            //    Logger.Info("呼び出し", "debug");
-            //    killer?.ReportDeadBody(Utils.GetPlayerInfoById(target.PlayerId));
-            //}
-
         }
 
         //キル確認
@@ -561,6 +566,7 @@ namespace TownOfHostForE
                 Main.killCount.Add(killer.PlayerId, 1);
             }
 
+            GreatDetective.TargetOnMurder(killer, target);
             Monkey.CheckKillAnimals(killer);
 
             return true;
@@ -574,7 +580,6 @@ namespace TownOfHostForE
                 killer.MurderPlayer(target, SuccessFlags);
 
             }
-            GreatDetective.TargetOnMurder(killer, target);
             MessageWriter messageWriter = AmongUsClient.Instance.StartRpcImmediately(killer.NetId, (byte)RpcCalls.MurderPlayer, SendOption.None, -1);
             messageWriter.WriteNetObject(target);
             AmongUsClient.Instance.FinishRpcImmediately(messageWriter);
@@ -594,13 +599,13 @@ namespace TownOfHostForE
             // Other Clients
             if (killer.PlayerId != 0)
             {
-                var writer = AmongUsClient.Instance.StartRpcImmediately(killer.NetId, (byte)RpcCalls.MurderPlayer, SendOption.Reliable);
+                var writer = AmongUsClient.Instance.StartRpcImmediately(killer.NetId, (byte)RpcCalls.MurderPlayer, SendOption.Reliable, killer.GetClientId());
                 writer.WriteNetObject(target);
                 writer.Write((int)MurderResultFlags.FailedProtected);
                 AmongUsClient.Instance.FinishRpcImmediately(writer);
             }
         }
-        public static void NoCheckStartMeeting(this PlayerControl reporter, GameData.PlayerInfo target)
+        public static void NoCheckStartMeeting(this PlayerControl reporter, NetworkedPlayerInfo target)
         { /*サボタージュ中でも関係なしに会議を起こせるメソッド
             targetがnullの場合はボタンとなる*/
             MeetingRoomManager.Instance.AssignSelf(reporter, target);

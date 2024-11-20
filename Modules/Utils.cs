@@ -11,7 +11,9 @@ using System.Text.RegularExpressions;
 using AmongUs.Data;
 using AmongUs.GameOptions;
 using Il2CppInterop.Runtime.InteropTypes;
+using InnerNet;
 using Mono.Cecil;
+using Rewired;
 using TownOfHostForE.GameMode;
 using TownOfHostForE.Modules;
 using TownOfHostForE.Roles;
@@ -490,7 +492,7 @@ namespace TownOfHostForE
             return (text, color);
         }
 
-        public static bool HasTasks(GameData.PlayerInfo p, bool ForRecompute = true)
+        public static bool HasTasks(NetworkedPlayerInfo p, bool ForRecompute = true)
         {
             if (GameStates.IsLobby) return false;
             //Tasksがnullの場合があるのでその場合タスク無しとする
@@ -999,11 +1001,9 @@ namespace TownOfHostForE
             }
             else
             {
-                //if (AmongUsClient.Instance.IsGamePublic)
-                //    name = $"<color={Main.ModColor}>TownOfHost_ForE v{Main.PleviewPluginVersion}</color>\r\n" + name;
+                if (AmongUsClient.Instance.IsGamePublic)
+                    name = $"<color={Main.ModColor}>TownOfHost_ForE v{Main.PleviewPluginVersion}</color>\r\n" + name;
 
-                //公開部屋できるまで誘導部屋対策としてMod名を表示
-                name += $"<color={Main.ModColor}><TOH4E></color>";
                 if (BetWinTeams.BetWinTeamMode.GetBool() && BetWinTeams.BetPoint.ContainsKey(PlayerControl.LocalPlayer.FriendCode) && !BetWinTeams.DisableShogo.GetBool())
                 {
                     if (BetWinTeams.BetPoint[PlayerControl.LocalPlayer.FriendCode].Syougo != null &&
@@ -1047,7 +1047,7 @@ namespace TownOfHostForE
             cachedPlayers[playerId] = player;
             return player;
         }
-        public static GameData.PlayerInfo GetPlayerInfoById(int PlayerId) =>
+        public static NetworkedPlayerInfo GetPlayerInfoById(int PlayerId) =>
             GameData.Instance.AllPlayers.ToArray().Where(info => info.PlayerId == PlayerId).FirstOrDefault();
         private static StringBuilder SelfMark = new(20);
         private static StringBuilder SelfSuffix = new(20);
@@ -1105,7 +1105,8 @@ namespace TownOfHostForE
                     SelfMark.Append(CustomRoleManager.GetMarkOthers(seer, isForMeeting: isForMeeting));
 
                     //ハートマークを付ける(自分に)
-                    if (seer.Is(CustomRoles.Lovers)) SelfMark.Append(ColorString(GetRoleColor(CustomRoles.Lovers), "♡"));
+                    //if (seer.Is(CustomRoles.Lovers)) SelfMark.Append(ColorString(GetRoleColor(CustomRoles.Lovers), "♡"));
+                    if (seer.Is(CustomRoles.Lovers)) SelfMark.Append(ColorString(LoversManager.GetLeaderColor(seer.PlayerId), "♡"));
 
                     //Markとは違い、改行してから追記されます。
                     SelfSuffix.Clear();
@@ -1246,14 +1247,16 @@ namespace TownOfHostForE
                             TargetMark.Append(CustomRoleManager.GetMarkOthers(seer, target, isForMeeting));
 
                             //ハートマークを付ける(相手に)
-                            if (CheckMyLovers(seer.PlayerId, target.PlayerId))
+                            if (LoversManager.CheckMyLovers(seer.PlayerId, target.PlayerId))
                             {
-                                TargetMark.Append($"<color={GetRoleColorCode(CustomRoles.Lovers)}>♥</color>");
+                                //TargetMark.Append($"<color={GetRoleColorCode(CustomRoles.Lovers)}>♥</color>");
+                                TargetMark.Append($"<color=#{ColorUtility.ToHtmlStringRGB(LoversManager.GetLeaderColor(target.PlayerId))}>♥</color>");
                             }
                             //霊界からラバーズ視認
                             else if (seer.Data.IsDead && target.Is(CustomRoles.Lovers))
                             {
-                                TargetMark.Append($"<color={GetRoleColorCode(CustomRoles.Lovers)}>♥</color>");
+                                //TargetMark.Append($"<color={GetRoleColorCode(CustomRoles.Lovers)}>♥</color>");
+                                TargetMark.Append($"<color=#{ColorUtility.ToHtmlStringRGB(LoversManager.GetLeaderColor(target.PlayerId))}>♥</color>");
                             }
 
                             //他人の役職とタスクは幽霊が他人の役職を見れるようになっていてかつ、seerが死んでいる場合のみ表示されます。それ以外の場合は空になります。
@@ -1341,16 +1344,13 @@ namespace TownOfHostForE
             }
         }
 
-        public static bool CheckMyLovers(byte seerId, byte targetId)
+        /// <summary>
+        /// ロビーに来た人にmod紹介ウェルカムメッセージ
+        /// (ウェルカムではない)
+        /// </summary>
+        public static void JoinLobbyModInfo(ClientData client)
         {
-            foreach (var list in Main.LoversPlayersV2)
-            {
-                if (list.Value.Contains(seerId) && list.Value.Contains(targetId))
-                {
-                    return true;
-                }
-            }
-            return false;
+            SendMessage("TOH4Eへようこそ！\n本部屋ではTownOfHostForEというModを導入して遊んでおります。\n現在AmongUsでは公開ルームでのMod利用が出来ません。<color=#FF0000>公開ルームからのMod部屋への誘導もおやめください。</color>\nもし誘導や勧誘などを確認した場合はスクリーンショットと合わせて開発者まで問い合わせをお願い致します。", client.Character.PlayerId, $"<color={Main.ModColor}>TownOfHost ForE</color>へようこそ！",false);
         }
 
         /// <summary>
@@ -1359,49 +1359,30 @@ namespace TownOfHostForE
         /// </summary>
         public static void JoinLobbyModInfo()
         {
+            if (!AmongUsClient.Instance.AmHost)
+            {
+                return;
+            }
             //ロビー限定
             if (!GameStates.IsLobby) return;
 
             _ = new LateTask(() =>
             {
-                string testVersionString = $"<align={"right"}><size=120%><color={Main.ModColor}>{Main.ModName}</color>\n<color=#ffffff>{Main.PleviewPluginVersion}\nHostFriendCode:{PlayerControl.LocalPlayer.FriendCode}</color></size></align>";
+                string modInfo = $"<color={Main.ModColor}><TOH4E></color>";
 
                 foreach (var target in Main.AllPlayerControls)
                 {
                     //ホストは変更しない
                     if (target.PlayerId == 0) continue;
-                    if (target.name.Contains(testVersionString)) continue;
 
-                    string targetName = target.name;
+                    string hostInfoName = target.name;
 
-                    targetName = SetModInfo(targetName);
+                    hostInfoName = hostInfoName + modInfo;
 
-                    //targetName = testVersionString + "\n" + targetName;
                     //適用
-                    target.RpcSetNamePrivateSingle(targetName, true);
+                    target.RpcSetNamePrivateSingle(hostInfoName, true);
                 }
             }, 1f, "LobbySetModInfo");
-        }
-
-        private static string SetModInfo(string targetName)
-        {
-            string testVersionString = $"<align={"center"}><size=120%><color={Main.ModColor}>{Main.ModName}</color>\n<color=#ffffff>{Main.PleviewPluginVersion}\nHostFriendCode:{PlayerControl.LocalPlayer.FriendCode}</color></size></align>";
-            int count = CountKaigyou(testVersionString);
-            int loop = 6;
-            for (int i = 0; i < loop; i++)
-            {
-                testVersionString += "\n";
-            }
-
-            testVersionString = testVersionString + "\n" + targetName;
-
-            for (int i = 0; i < count + loop + 1; i++)
-            {
-                testVersionString += "\n";
-            }
-
-            return testVersionString;
-
         }
 
         private static int CountKaigyou(string targetString)
@@ -1472,25 +1453,65 @@ namespace TownOfHostForE
             foreach (char c in t) bc += Encoding.GetEncoding("UTF-8").GetByteCount(c.ToString()) == 1 ? 1 : 2;
             return t?.PadRight(Mathf.Max(num - (bc - t.Length), 0));
         }
+        public static DirectoryInfo GetLogFolder(bool auto = false)
+        {
+            var folder = Directory.CreateDirectory($"{Application.persistentDataPath}/TownOfHost/Logs");
+            if (auto)
+            {
+                folder = Directory.CreateDirectory($"{folder.FullName}/AutoLogs");
+            }
+            return folder;
+        }
         public static void DumpLog()
         {
-            string t = DateTime.Now.ToString("yyyy-MM-dd_HH.mm.ss");
-            string filename = $"{System.Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}/TOH4E-v{Main.PleviewPluginVersion}-{t}.log";
-            FileInfo file = new(@$"{System.Environment.CurrentDirectory}/BepInEx/LogOutput.log");
-            file.CopyTo(@filename);
-            OpenDirectory(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory));
+            var logs = GetLogFolder();
+            var filename = CopyLog(logs.FullName);
+            OpenDirectory(filename);
             if (PlayerControl.LocalPlayer != null)
-                HudManager.Instance?.Chat?.AddChat(PlayerControl.LocalPlayer, "デスクトップにログを保存しました。バグ報告チケットを作成してこのファイルを添付してください。");
+                HudManager.Instance?.Chat?.AddChat(PlayerControl.LocalPlayer, Translator.GetString("Message.LogsSavedInLogsFolder"));
+        }
+        public static void SaveNowLog()
+        {
+            var logs = GetLogFolder(true);
+            // 7日以上前のログを削除
+            logs.EnumerateFiles().Where(f => f.CreationTime < DateTime.Now.AddDays(-7)).ToList().ForEach(f => f.Delete());
+            CopyLog(logs.FullName);
+        }
+        public static string CopyLog(string path)
+        {
+            string t = DateTime.Now.ToString("yyyy-MM-dd_HH.mm.ss");
+            string fileName = $"{path}/TownOfHost-v{Main.PluginVersion}-{t}.log";
+            FileInfo file = new(@$"{Environment.CurrentDirectory}/BepInEx/LogOutput.log");
+            var logFile = file.CopyTo(fileName);
+            return logFile.FullName;
+        }
+        public static void OpenLogFolder()
+        {
+            var logs = GetLogFolder(true);
+            OpenDirectory(logs.FullName);
         }
         public static void OpenDirectory(string path)
         {
-            var startInfo = new ProcessStartInfo(path)
-            {
-                UseShellExecute = true,
-            };
-            Process.Start(startInfo);
+            Process.Start("Explorer.exe", $"/select,{path}");
         }
-        public static string RemoveColorTags(this string str) => Regex.Replace(str, "</?color(=#[0-9a-fA-F]*)?>", "");
+
+        /// <summary>
+        /// 対象文字列から指定した文字列以降を削除します。
+        /// ただし、対象文字列内に指定した文字列が存在しなかった場合、対象文字列をそのまま返却します。
+        /// </summary>
+        /// <param name="str">対象文字列</param>
+        /// <param name="removeStr">指定文字列</param>
+        /// <returns>対象文字列から指定文字列を削除した文字列</returns>
+        public static string RemoveRightString(string str, string removeStr)
+        {
+            var length = str.IndexOf(removeStr);
+            if (length < 0)
+            {
+                return str;
+            }
+
+            return str.Substring(0, length);
+        }
         public static string SummaryTexts(byte id, bool isForChat)
         {
 
@@ -1529,6 +1550,7 @@ namespace TownOfHostForE
             return builder.ToString();
         }
         public static string RemoveHtmlTags(this string str) => Regex.Replace(str, "<[^>]*?>", "");
+        public static string RemoveColorTags(this string str) => Regex.Replace(str, "</?color(=#[0-9a-fA-F]*)?>", "");
         public static void FlashColor(Color color, float duration = 1f)
         {
             var hud = DestroyableSingleton<HudManager>.Instance;

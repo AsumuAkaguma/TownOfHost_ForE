@@ -100,7 +100,7 @@ namespace TownOfHostForE
                         if (IsAirshipVanillaSpawnPosition(position))
                         {
                             AirshipSpawn(player);
-                            return false;
+                            return !IsRandomSpawn();
                         }
                         else
                         {

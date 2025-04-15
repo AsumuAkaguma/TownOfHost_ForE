@@ -283,7 +283,7 @@ namespace TownOfHostForE.Roles.Impostor
 
                 Vector3 targetPos = Vector3.zero;
                 Vector3 shapeTargetPos = Vector3.zero;
-                var KillRange = GameOptionsData.KillDistances[Mathf.Clamp(Main.NormalOptions.KillDistance, 0, 2)];
+                var KillRange = NormalGameOptionsV09.KillDistances[Mathf.Clamp(Main.NormalOptions.KillDistance, 0, 2)];
 
                 foreach (var target in Main.AllPlayerControls)
                 {

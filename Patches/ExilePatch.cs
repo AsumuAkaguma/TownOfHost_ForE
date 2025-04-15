@@ -121,7 +121,16 @@ namespace TownOfHostForE
             FallFromLadder.Reset();
             Utils.CountAlivePlayers(true);
             Utils.AfterMeetingTasks();
-            Utils.SyncAllSettings();
+            if (mapId != 4)
+            {
+                foreach (var pc in Main.AllPlayerControls)
+                {
+                    pc.GetRoleClass()?.OnSpawn();
+                    pc.SyncSettings();
+                    pc.RpcResetAbilityCooldown();
+                }
+
+            }
             Utils.NotifyRoles();
         }
         static void WrapUpFinalizer(NetworkedPlayerInfo exiled)
@@ -137,7 +146,7 @@ namespace TownOfHostForE
                         exiled != null && //exiledがnullでない
                         exiled.Object != null) //exiled.Objectがnullでない
                     {
-                        exiled.Object.RpcExileV2();
+                        exiled.Object.RpcExile();
                     }
                 }, 0.5f, "Restore IsDead Task");
                 _ = new LateTask(() =>
@@ -151,7 +160,7 @@ namespace TownOfHostForE
                         Logger.Info($"{player.GetNameWithRole()}を{x.Value}で死亡させました", "AfterMeetingDeath");
                         state.DeathReason = x.Value;
                         state.SetDead();
-                        player?.RpcExileV2();
+                        player?.RpcExile();
                         if (x.Value == CustomDeathReason.Suicide)
                             player?.SetRealKiller(player, true);
                         if (requireResetCam)
@@ -166,6 +175,7 @@ namespace TownOfHostForE
             GameStates.AlreadyDied |= !Utils.IsAllAlive;
             RemoveDisableDevicesPatch.UpdateDisableDevices();
             SoundManager.Instance.ChangeAmbienceVolume(DataManager.Settings.Audio.AmbienceVolume);
+            GameStates.InTask = true;
             Logger.Info("タスクフェイズ開始", "Phase");
             Badger.MeetingEndCheck();
             Tiikawa.MeetingEndCheck();

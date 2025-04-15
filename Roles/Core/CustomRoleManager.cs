@@ -84,8 +84,8 @@ public static class CustomRoleManager
         {
             if (killer.IsKiller)
             {
-                // イビルディバイナーのみ占いのためここで先に処理
-                if (killerRole is EvilDiviner && !EvilDiviner.OnCheckMurder(attemptKiller, attemptTarget)) return false;
+                //// イビルディバイナーのみ占いのためここで先に処理
+                //if (killerRole is EvilDiviner && !EvilDiviner.OnCheckMurder(attemptKiller, attemptTarget)) return false;
                 // ガーディング属性によるガード
                 if (!Guarding.OnCheckMurder(info)) return false;
                 // メディックの対象プレイヤー
@@ -101,7 +101,11 @@ public static class CustomRoleManager
                 }
             }
             // キラーのキルチェック処理実行
-            killer.OnCheckMurderAsKiller(info);
+            if (!DoubleTrigger.OnCheckMurderAsKiller(info))
+            {
+                //ダブルトリガー無効なら通常処理
+                killer.OnCheckMurderAsKiller(info);
+            }
         }
 
         //キル可能だった場合のみMurderPlayerに進む

@@ -13,6 +13,7 @@ using UnityEngine;
 using TownOfHostForE.Attributes;
 using TownOfHostForE.Roles.Core;
 using TownOfHostForE.Modules;
+using TownOfHost_ForE.Modules;
 
 [assembly: AssemblyFileVersionAttribute(TownOfHostForE.Main.PluginVersion)]
 [assembly: AssemblyInformationalVersionAttribute(TownOfHostForE.Main.PluginVersion)]
@@ -52,10 +53,10 @@ namespace TownOfHostForE
         // ==========
         //Sorry for many Japanese comments.
         public const string PluginGuid = "com.AsumuAkaguma.townofhostfore";
-        public const string PluginVersion = "517.4.0.2";
-        public const string PleviewPluginVersion = "Commemorative-αγ";
+        public const string PluginVersion = "5111.5.0.0";
+        public const string PleviewPluginVersion = "Degrade";
         // サポートされている最低のAmongUsバージョン
-        public static readonly string LowestSupportedVersion = "2024.06.18";
+        public static readonly string LowestSupportedVersion = "2025.03.25";
         // このバージョンのみで公開ルームを無効にする場合
         public static readonly bool IsPublicAvailableOnThisVersion = false;
         // プレリリースかどうか
@@ -87,8 +88,8 @@ namespace TownOfHostForE
         public static string ExceptionMessage;
         public static bool ExceptionMessageIsShown = false;
         public static string credentialsText;
-        public static NormalGameOptionsV08 NormalOptions => GameOptionsManager.Instance.currentNormalGameOptions;
-        public static HideNSeekGameOptionsV08 HideNSeekSOptions => GameOptionsManager.Instance.currentHideNSeekGameOptions;
+        public static NormalGameOptionsV09 NormalOptions => GameOptionsManager.Instance.currentNormalGameOptions;
+        public static HideNSeekGameOptionsV09 HideNSeekSOptions => GameOptionsManager.Instance.currentHideNSeekGameOptions;
         //Client Options
         public static ConfigEntry<string> HideName { get; private set; }
         public static ConfigEntry<string> HideColor { get; private set; }
@@ -139,7 +140,7 @@ namespace TownOfHostForE
         public static Dictionary<byte, byte> ShapeshiftTarget = new();
         public static bool VisibleTasksCount;
         public static string nickName = "";
-        public static bool introDestroyed = false;
+        public static bool isFirstTurn = false;
         public static float DefaultCrewmateVision;
         public static float DefaultImpostorVision;
         public static bool IsValentine = DateTime.Now.Month == 3 && DateTime.Now.Day is 9 or 10 or 11 or 12 or 13 or 14 or 15;
@@ -163,6 +164,9 @@ namespace TownOfHostForE
         public override void Load()
         {
             Instance = this;
+
+            //DLL読み込み
+            LoadDLL.OnLoadDLL();
 
             //Client Options
             HideName = Config.Bind("Client Options", "Hide Game Code Name", "Town Of Host ForE");

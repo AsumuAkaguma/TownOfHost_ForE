@@ -90,6 +90,7 @@ namespace TownOfHostForE
         // 各役職の詳細設定
         public static OptionItem EnableGM;
         public static float DefaultKillCooldown = Main.NormalOptions?.KillCooldown ?? 20;
+        public static OptionItem DoubleTriggerThreshold;
         public static OptionItem DefaultShapeshiftCooldown;
         public static OptionItem ImpostorOperateVisibility;
         public static OptionItem CanMakeMadmateCount;

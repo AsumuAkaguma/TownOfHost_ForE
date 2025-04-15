@@ -116,7 +116,7 @@ public sealed class Counselor : RoleBase
         var target = KillWaitPlayer;
         float targetDistance = Vector2.Distance(GSpos, target.transform.position);
 
-        var KillRange = GameOptionsData.KillDistances[Mathf.Clamp(Main.NormalOptions.KillDistance, 0, 2)];
+        var KillRange = NormalGameOptionsV09.KillDistances[Mathf.Clamp(Main.NormalOptions.KillDistance, 0, 2)];
         if (targetDistance <= KillRange && Player.CanMove && target.CanMove)
         {
             CanKillFlag = true;

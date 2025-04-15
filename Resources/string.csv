@@ -948,7 +948,7 @@ GhostCanSeeOtherTasks,"Ghosts Can't See Other Tasks","幽霊が他人のタス�
 "MadSnitchTaskTrigger","Tasks Until Boost Activated","効果を発動するタスク数","","","",""
 "LighterTriggerType","Ability Activation Condition","能力発動条件","","","Условие активации способности",""
 "LighterTaskTrigger","Tasks Until Boost Activated","効果を発動するタスク数","","","Количество задач повышающие скорость",""
-
+"DoubleTriggerThreashould","Double Trigger Threashould","ダブルトリガー閾値"
 
 "AssignMode","Assign Algorithm Mode","アサインモード","","","",""
 "AssignAlgorithm.Fixed","Fixed","固定","","","",""

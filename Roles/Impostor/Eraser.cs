@@ -109,7 +109,7 @@ namespace TownOfHostForE.Roles.Impostor
         {
 
             Dictionary<float, byte> KillDic = new();
-            var KillRange = GameOptionsData.KillDistances[Mathf.Clamp(Main.NormalOptions.KillDistance, 0, 2)];
+            var KillRange = NormalGameOptionsV09.KillDistances[Mathf.Clamp(Main.NormalOptions.KillDistance, 0, 2)];
 
             //範囲に入っている人算出
             foreach (var pc in Main.AllAlivePlayerControls)

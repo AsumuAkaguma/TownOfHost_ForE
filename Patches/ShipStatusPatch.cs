@@ -20,7 +20,7 @@ namespace TownOfHostForE
             //ここより上、全員が実行する
             if (!AmongUsClient.Instance.AmHost) return;
             //ここより下、ホストのみが実行する
-            if ((Options.CurrentGameMode == CustomGameMode.HideAndSeek || Options.IsStandardHAS) && Main.introDestroyed)
+            if ((Options.CurrentGameMode == CustomGameMode.HideAndSeek || Options.IsStandardHAS) && Main.isFirstTurn)
             {
                 if (Options.HideAndSeekKillDelayTimer > 0)
                 {

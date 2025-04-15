@@ -177,31 +177,21 @@ public static class MeetingHudPatch
 
                 _ = new LateTask(() =>
                 {
-                    foreach (var seen in Main.AllPlayerControls)
+                    foreach (var seer in Main.AllPlayerControls)
                     {
-                        var seenName = seen.GetRealName(isMeeting: true);
-                        var coloredName = Utils.ColorString(seen.GetRoleColor(), seenName);
-                        foreach (var seer in Main.AllPlayerControls)
+                        if (seer.IsModClient()) continue;
+                        var sender = CustomRpcSender.Create("SetNameToChat", Hazel.SendOption.Reliable);
+                        sender.StartMessage(seer.GetClientId());
+
+                        foreach (var seen in Main.AllPlayerControls)
                         {
-                            seen.RpcSetNamePrivate(
-                                seer == seen ? coloredName : seenName,
-                                true,
-                                seer);
+                            var seenName = seen.GetRealName(isMeeting: true);
+                            var coloredName = Utils.ColorString(seen.GetRoleColor(), seenName);
+                            sender.RpcSetName(seen, seer == seen ? coloredName : seenName, seer);
                         }
+                        sender.SendMessage();
                     }
                     ChatUpdatePatch.DoBlockChat = false;
-                    //foreach (var seer in Main.AllPlayerControls)
-                    //{
-                    //    foreach (var target in Main.AllPlayerControls)
-                    //    {
-                    //        var seerName = seer.GetRealName(isMeeting: true);
-                    //        var coloredName = Utils.ColorString(seer.GetRoleColor(), seerName);
-                    //        seer.RpcSetNamePrivate(
-                    //            seer == target ? coloredName : seerName,
-                    //            true);
-                    //    }
-                    //}
-                    //ChatUpdatePatch.DoBlockChat = false;
                 }, 3f, "SetName To Chat");
             }
 
@@ -331,7 +321,7 @@ public static class MeetingHudPatch
                 __instance.playerStates.DoIf(x => x.HighlightedFX.enabled, x =>
                 {
                     var player = Utils.GetPlayerById(x.TargetPlayerId);
-                    player.RpcExileV2();
+                    player.RpcExile();
                     var state = PlayerState.GetByPlayerId(player.PlayerId);
                     state.DeathReason = CustomDeathReason.Execution;
                     state.SetDead();

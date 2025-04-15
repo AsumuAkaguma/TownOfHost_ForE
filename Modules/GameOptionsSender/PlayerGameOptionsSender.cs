@@ -26,7 +26,7 @@ namespace TownOfHostForE.Modules
             .ToList().ForEach(sender => sender.SetDirty());
 
         public override IGameOptions BasedGameOptions =>
-            Main.RealOptionsData.Restore(new NormalGameOptionsV08(new UnityLogger().Cast<ILogger>()).Cast<IGameOptions>());
+            Main.RealOptionsData.Restore(new NormalGameOptionsV09(new UnityLogger().Cast<ILogger>()).Cast<IGameOptions>());
         public override bool IsDirty { get; protected set; }
 
         public PlayerControl player;
@@ -160,7 +160,7 @@ namespace TownOfHostForE.Modules
             }
 
             state.taskState.hasTasks = Utils.HasTasks(player.Data, false);
-            if (!Options.GhostCanSeeOtherVotes.GetBool() && player.Data.IsDead)
+            if (Options.GhostCanSeeOtherVotes.GetBool() && player.Data.IsDead)
                 opt.SetBool(BoolOptionNames.AnonymousVotes, false);
             if (Options.AdditionalEmergencyCooldown.GetBool() &&
                 Options.AdditionalEmergencyCooldownThreshold.GetInt() <= Utils.AllAlivePlayersCount)

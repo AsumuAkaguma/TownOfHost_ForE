@@ -53,7 +53,7 @@ namespace TownOfHostForE
         // ==========
         //Sorry for many Japanese comments.
         public const string PluginGuid = "com.AsumuAkaguma.townofhostfore";
-        public const string PluginVersion = "5111.5.0.0";
+        public const string PluginVersion = "5112.5.0.0";
         public const string PleviewPluginVersion = "Degrade";
         // サポートされている最低のAmongUsバージョン
         public static readonly string LowestSupportedVersion = "2025.03.25";

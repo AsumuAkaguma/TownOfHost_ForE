@@ -144,8 +144,9 @@ namespace TownOfHostForE
             Dictionary<byte, CustomRpcSender> senders = new();
             foreach (var pc in Main.AllPlayerControls)
             {
-                senders[pc.PlayerId] = new CustomRpcSender($"{pc.name}'s SetRole Sender", SendOption.Reliable, false)
-                        .StartMessage(pc.GetClientId());
+                senders[pc.PlayerId] = new CustomRpcSender($"{pc.name}'s SetRole Sender", SendOption.Reliable, false);
+                if (pc.PlayerId != 0)
+                    senders[pc.PlayerId].StartMessage(pc.GetClientId());
             }
             RpcSetRoleReplacer.StartReplace(senders);
 
@@ -205,7 +206,7 @@ namespace TownOfHostForE
 
             // 不要なオブジェクトの削除
             RpcSetRoleReplacer.senders = null;
-            RpcSetRoleReplacer.OverriddenSenderList = null;
+            RpcSetRoleReplacer.DesyncImpostorList = null;
             RpcSetRoleReplacer.StoragedData = null;
 
             //Utils.ApplySuffix();
@@ -514,7 +515,7 @@ namespace TownOfHostForE
                         rolesMap[(seer.PlayerId, player.PlayerId)] = othersRole;
                     }
                 }
-                RpcSetRoleReplacer.OverriddenSenderList.Add(senders[player.PlayerId]);
+                RpcSetRoleReplacer.DesyncImpostorList.Add(player.PlayerId);
                 //ホスト視点はロール決定
                 if (player.PlayerId == hostId)
                 {
@@ -690,8 +691,7 @@ namespace TownOfHostForE
             public static bool doReplace = false;
             public static Dictionary<byte, CustomRpcSender> senders;
             public static List<(PlayerControl, RoleTypes)> StoragedData = new();
-            // 役職Desyncなど別の処理でSetRoleRpcを書き込み済みなため、追加の書き込みが不要なSenderのリスト
-            public static List<CustomRpcSender> OverriddenSenderList;
+            public static List<byte> DesyncImpostorList;
             public static bool Prefix(PlayerControl __instance, [HarmonyArgument(0)] RoleTypes roleType)
             {
                 if (doReplace && senders != null)
@@ -703,20 +703,26 @@ namespace TownOfHostForE
             }
             public static void Release()
             {
-                foreach (var sender in senders)
+                foreach (var (player, role) in StoragedData)
                 {
-                    if (OverriddenSenderList.Contains(sender.Value)) continue;
-                    if (sender.Value.CurrentState != CustomRpcSender.State.InRootMessage)
-                        throw new InvalidOperationException("A CustomRpcSender had Invalid State.");
+                    //ホスト視点は即確定
+                    player.StartCoroutine(player.CoSetRole(role, false));
 
-                    foreach (var pair in StoragedData)
+                    var impostorRole = role is RoleTypes.Impostor or RoleTypes.Shapeshifter or RoleTypes.Phantom;
+                    if (impostorRole && DesyncImpostorList.Count != 0)
                     {
-                        pair.Item1.StartCoroutine(pair.Item1.CoSetRole(pair.Item2, false));
-                        sender.Value.AutoStartRpc(pair.Item1.NetId, (byte)RpcCalls.SetRole, Utils.GetPlayerById(sender.Key).GetClientId())
-                            .Write((ushort)pair.Item2)
-                            .EndRpc();
+                        foreach (var seer in Main.AllPlayerControls)
+                        {
+                            if (seer.PlayerId == 0) continue;
+                            var assignRole = DesyncImpostorList.Contains(seer.PlayerId) ? RoleTypes.Scientist : role;
+                            senders[seer.PlayerId].RpcSetRole(player, assignRole, seer.GetClientId());
+                        }
                     }
-                    sender.Value.EndMessage();
+                    else
+                    {
+                        //ブロードキャストで送信
+                        senders[0].RpcSetRole(player, role);
+                    }
                 }
                 doReplace = false;
             }
@@ -724,7 +730,7 @@ namespace TownOfHostForE
             {
                 RpcSetRoleReplacer.senders = senders;
                 StoragedData = new();
-                OverriddenSenderList = new();
+                DesyncImpostorList = new();
                 doReplace = true;
             }
         }

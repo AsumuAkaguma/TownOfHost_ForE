@@ -137,6 +137,10 @@
 		<Reference Include="C:\Program Files %28x86%29\Steam\steamapps\common\Among Us _dev\BepInEx\interop\UnityEngine.VRModule.dll" />
 		<Reference Include="C:\Program Files %28x86%29\Steam\steamapps\common\Among Us _dev\BepInEx\interop\UnityEngine.WindModule.dll" />
 		<Reference Include="C:\Program Files %28x86%29\Steam\steamapps\common\Among Us _dev\BepInEx\interop\UnityEngine.XRModule.dll" />
+		<Reference Include="ForhiteListEngine">
+		  <HintPath>dll\ForhiteListEngine.dll</HintPath>
+		  <Private>False</Private>
+		</Reference>
 		<Reference Include="Newtonsoft.Json">
 		  <HintPath>dll\Newtonsoft.Json.dll</HintPath>
 		</Reference>

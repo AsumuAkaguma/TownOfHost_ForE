@@ -143,7 +143,6 @@ namespace TownOfHostForE
                 Logger.Error($"ID:{id}が重複しています", "OptionItem");
             }
         }
-
         // Setter
         public OptionItem Do(Action<OptionItem> action)
         {

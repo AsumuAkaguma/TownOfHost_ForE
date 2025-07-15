@@ -11,6 +11,7 @@ using TownOfHostForE.Roles;
 using TownOfHostForE.Roles.Core;
 using TownOfHostForE.Roles.Neutral;
 using static TownOfHostForE.Translator;
+using TownOfHostForE.Modules.OtherServices;
 
 namespace TownOfHostForE
 {
@@ -179,6 +180,9 @@ namespace TownOfHostForE
                     Utils.JoinLobbyModInfo(client);
                     TemplateManager.SendTemplate("welcome", client.Character.PlayerId, true);
                     BetWinTeams.JoinLobbySyougo(client.Character);
+                    //ポスと
+                    Main.BlueSkyMain.PostRecruit();
+
                 }, 3f, "Welcome Message");
                 if (Options.AutoDisplayLastResult.GetBool() && PlayerState.AllPlayerStates.Count != 0 && Main.clientIdList.Contains(client.Id))
                 {

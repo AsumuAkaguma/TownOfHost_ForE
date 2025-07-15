@@ -171,7 +171,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Modules\YouTube\" />
+	  <Folder Include="Modules\OtherServices\YouTube\" />
 	</ItemGroup>
 
 	<Target Name="Copy" AfterTargets="Build" Condition="'C:\Program Files (x86)\Steam\steamapps\common\Among Us _dev' != ''">

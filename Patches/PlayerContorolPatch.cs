@@ -17,6 +17,7 @@ using TownOfHostForE.Roles.AddOns.Crewmate;
 using TownOfHostForE.Roles.Impostor;
 using TownOfHostForE.Roles.Crewmate;
 using TownOfHostForE.GameMode;
+using TownOfHostForE.Modules.OtherServices.YouTube;
 
 namespace TownOfHostForE
 {

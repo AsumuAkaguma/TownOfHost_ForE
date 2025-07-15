@@ -1651,6 +1651,55 @@ namespace TownOfHostForE
             }
             return new Color();
         }
+
+
+        /// <summary>
+        /// Dictionary<int, T> のキーから連続した未登録の番号範囲をコンソールに出力する
+        /// </summary>
+        /// <typeparam name="T">辞書の値の型</typeparam>
+        /// <param name="dict">対象の辞書</param>
+        public static void PrintMissingRanges<T>(Dictionary<int, T> dict)
+        {
+            if (dict == null || dict.Count == 0)
+            {
+                Logger.Error("NULL", "RangeCheck");
+                return;
+            }
+
+            var keys = dict.Keys.ToList();
+            keys.Sort();
+
+            int min = keys.First();
+            int max = keys.Last();
+
+            var existingKeys = new HashSet<int>(keys);
+            int? currentStart = null;
+
+            Logger.Error("未登録の番号範囲", "RangeCheck");
+
+            for (int i = min; i <= max; i++)
+            {
+                if (!existingKeys.Contains(i))
+                {
+                    if (currentStart == null)
+                        currentStart = i;
+                }
+                else
+                {
+                    if (currentStart != null)
+                    {
+                        Logger.Error($"{currentStart.Value} ~ {i - 1}", "RangeCheck");
+                        currentStart = null;
+                    }
+                }
+            }
+
+            // 最後が未登録で終わった場合
+            if (currentStart != null)
+            {
+                Logger.Error($"{currentStart.Value} ~ {max}", "RangeCheck");
+            }
+        }
         public static int AllPlayersCount => PlayerState.AllPlayerStates.Values.Count(state => state.CountType != CountTypes.OutOfGame);
         public static int AllAlivePlayersCount => Main.AllAlivePlayerControls.Count(pc => !pc.Is(CountTypes.OutOfGame));
         public static bool IsAllAlive => PlayerState.AllPlayerStates.Values.All(state => state.CountType == CountTypes.OutOfGame || !state.IsDead);

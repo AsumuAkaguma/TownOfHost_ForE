@@ -123,6 +123,7 @@ namespace TownOfHostForE
         public static OptionItem DisableUploadData;
         public static OptionItem DisableStartReactor;
         public static OptionItem DisableResetBreaker;
+        public static OptionItem DisableFixWeatherNode;
 
         //デバイスブロック
         public static OptionItem DisableDevices;
@@ -458,7 +459,6 @@ namespace TownOfHostForE
             WordLimitOptions = StringOptionItem.Create(25_001_001, "WordLimit", wordLimitMode, 0, TabGroup.MainSettings, true)
                 .SetColor(Color.yellow)
                 .SetGameMode(CustomGameMode.Standard);
-            RoleAssignManager.SetupOptionItem();
             BetWinTeams.SetupCustomOption();
             #endregion
 
@@ -492,6 +492,9 @@ namespace TownOfHostForE
                 info.OptionCreator?.Invoke();
             });
 
+            DoubleTriggerThreshold = FloatOptionItem.Create(90080, "DoubleTriggerThreashould", new(0.3f, 1f, 0.1f), 0.5f, TabGroup.ImpostorRoles, false)
+                .SetHeader(true)
+                .SetValueFormat(OptionFormat.Seconds);
 
             DefaultShapeshiftCooldown = FloatOptionItem.Create(90100, "DefaultShapeshiftCooldown", new(5f, 999f, 5f), 15f, TabGroup.ImpostorRoles, false)
                 .SetHeader(true)
@@ -848,6 +851,8 @@ namespace TownOfHostForE
             DisableUploadData = BooleanOptionItem.Create(100404, "DisableUploadDataTask", false, TabGroup.MainSettings, false).SetParent(DisableTasks);
             DisableStartReactor = BooleanOptionItem.Create(100405, "DisableStartReactorTask", false, TabGroup.MainSettings, false).SetParent(DisableTasks);
             DisableResetBreaker = BooleanOptionItem.Create(100406, "DisableResetBreakerTask", false, TabGroup.MainSettings, false).SetParent(DisableTasks);
+            DisableFixWeatherNode = BooleanOptionItem.Create(100407, "DisableFixWeatherNodeTask", false, TabGroup.MainSettings, false).SetParent(DisableTasks)
+                            .SetGameMode(CustomGameMode.All);
 
             // タスク勝利無効化
             DisableTaskWin = BooleanOptionItem.Create(1_001_000, "DisableTaskWin", false, TabGroup.MainSettings, false)

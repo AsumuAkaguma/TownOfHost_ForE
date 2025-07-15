@@ -13,6 +13,7 @@ namespace TownOfHostForE
         private static ClientActionItem DumpLog;
         private static ClientOptionItem EnableCustomSoundEffect;
         private static ClientOptionItem EnableCustomBGMEffect;
+        private static ClientOptionItem EnableBlueSkyPost;
 
         public static void Postfix(OptionsMenuBehaviour __instance)
         {
@@ -46,6 +47,10 @@ namespace TownOfHostForE
             if (EnableCustomSoundEffect == null || EnableCustomSoundEffect.ToggleButton == null)
             {
                 EnableCustomSoundEffect = ClientOptionItem.Create("EnableCustomSoundEffect", Main.EnableCustomSoundEffect, __instance);
+            }
+            if ((EnableBlueSkyPost == null || EnableBlueSkyPost.ToggleButton == null ) && Main.BlueSkyMain.ViewBlueSkyButton)
+            {
+                EnableBlueSkyPost = ClientOptionItem.Create("EnableBlueSkyPost", Main.EnableBlueSkyPost, __instance);
             }
             if (ModUnloaderScreen.Popup == null)
             {

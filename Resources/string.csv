@@ -181,6 +181,7 @@ BrakiButtonText,Paint&Explosion,塗る&爆発,油漆和爆炸,
 "GuessKillTitle","【 ★ Message about Guessing ★ 】",【†おい、ゲッサーがやりやがった！† 】,"【 ★ 赌场事件 ★ 】"
 TOHEOptions,TOH4EOptions,TOH4Eカスタム,TOH4EOptions
 EnableCustomSoundEffect,EnableCustomSoundEffect,カスタムサウンドを有効にする,EnableCustomSoundEffect
+EnableBlueSkyPost,EnableBlueSkyPost,BlueSkyでの募集を有効にする,EnableBlueSkyPost
 Back,Back,戻る,Back
 TereporterSetPhase,Put up the gate.,ゲートを設置しろ,竖起大门
 TereporterActivePhase,You can use the gate.,ゲートが使えるぞ,您可以使用大门
@@ -819,6 +820,7 @@ Chu2ByoInfoLong,"(Add-ons):\nReleasing the ability to dictate gains the ability 
 "DisableUploadDataTask","Disable UploadData Tasks","ダウンロードタスク","禁用上传数据任务","禁用上傳任務","Отключить Задание ''Загрузка Данных''","Desativar Tarefas de Baixar Dados"
 "DisableStartReactorTask","Disable StartReactor Tasks","原子炉起動タスク","禁用启动反应堆任务","禁用啟動反應堆任務","Отключить Задание ''Запустить Реактор''","Desativar Tarefas de Acionar Reator"
 "DisableResetBreakerTask","Disable ResetBreaker Tasks","ブレーカーリセットタスク","禁用重置反应堆任务","禁用重置斷路器任務","Отключить Задание ''Рычаги(Airship)''","Desativar Reiniciar Disjuntores"
+"DisableFixWeatherNodeTask","Disable FixWeatherNode Tasks","気象ノードタスク","","","","",""
 "SuffixMode","Suffix","名前の二行目","附加标签","名字標籤","Суффикс","Sufixo"
 "SuffixMode.None","None","なし","无","無","Ничего","Nenhum"
 "SuffixMode.Version","Version","バージョン","版本","版本","Версия","Versão"

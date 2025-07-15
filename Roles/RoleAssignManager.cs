@@ -11,7 +11,7 @@ namespace TownOfHostForE.Roles
 {
     public static class RoleAssignManager
     {
-        private static readonly int idStart = 500;
+        private static readonly int idStart = 560;
         public class RandomAssignOptions
         {
             public int Min => min();
@@ -19,7 +19,7 @@ namespace TownOfHostForE.Roles
             public int Max => max();
             private Func<int> max;
 
-            public RandomAssignOptions(int id, OptionItem parent, CustomRoleTypes roleTypes, int maxCount)
+            private RandomAssignOptions(int id, OptionItem parent, CustomRoleTypes roleTypes, int maxCount)
             {
                 var replacementDictionary = new Dictionary<string, string>()
                 { { "%roleType%", GetString( $"CustomRoleTypes.{roleTypes}") } };

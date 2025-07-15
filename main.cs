@@ -13,7 +13,7 @@ using UnityEngine;
 using TownOfHostForE.Attributes;
 using TownOfHostForE.Roles.Core;
 using TownOfHostForE.Modules;
-using TownOfHost_ForE.Modules;
+using TownOfHostForE.Modules.OtherServices;
 
 [assembly: AssemblyFileVersionAttribute(TownOfHostForE.Main.PluginVersion)]
 [assembly: AssemblyInformationalVersionAttribute(TownOfHostForE.Main.PluginVersion)]
@@ -53,10 +53,10 @@ namespace TownOfHostForE
         // ==========
         //Sorry for many Japanese comments.
         public const string PluginGuid = "com.AsumuAkaguma.townofhostfore";
-        public const string PluginVersion = "5112.5.0.0";
+        public const string PluginVersion = "5113.5.0.0";
         public const string PleviewPluginVersion = "Degrade";
         // サポートされている最低のAmongUsバージョン
-        public static readonly string LowestSupportedVersion = "2025.03.25";
+        public static readonly string LowestSupportedVersion = "2025.04.20";
         // このバージョンのみで公開ルームを無効にする場合
         public static readonly bool IsPublicAvailableOnThisVersion = false;
         // プレリリースかどうか
@@ -161,6 +161,9 @@ namespace TownOfHostForE
         public static int tempImpostorNum = 0;
         public static ConfigEntry<bool> EnableCustomSoundEffect { get; private set; }
         public static ConfigEntry<bool> EnableCustomBGMEffect { get; private set; }
+        public static ConfigEntry<bool> EnableBlueSkyPost { get; private set; }
+        public static PostBlueSky BlueSkyMain { get; private set; }
+
         public override void Load()
         {
             Instance = this;
@@ -209,6 +212,10 @@ namespace TownOfHostForE
             EnableCustomSoundEffect = Config.Bind("Client Options", "EnableCustomSoundEffect", true);
 
             EnableCustomBGMEffect = Config.Bind("Client Options", "EnableCustomBGMEffect", true);
+
+            //青空関連
+            EnableBlueSkyPost = Config.Bind("Client Options", "EnableBlueSkyPost", false);
+            BlueSkyMain = new PostBlueSky(); 
 
             PluginModuleInitializerAttribute.InitializeAll();
 

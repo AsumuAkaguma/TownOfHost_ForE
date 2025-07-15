@@ -1,4 +1,4 @@
-﻿namespace YoutubeLiveChatSharp
+namespace TownOfHostForE.Modules.OtherServices.YouTube
 {
     public struct Comment
     {
@@ -7,7 +7,7 @@
         public readonly string userName;
         public readonly string userId;
 
-        public Comment(string text,string commentId, string userName, string userId)
+        public Comment(string text, string commentId, string userName, string userId)
         {
             this.text = text;
             this.commentId = commentId;

@@ -2,7 +2,7 @@ using System;
 using System.Reflection;
 using System.Collections.Generic;
 
-namespace TownOfHost_ForE.Modules
+namespace TownOfHostForE.Modules
 {
     internal class LoadDLL
     {

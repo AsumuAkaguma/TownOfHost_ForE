@@ -24,7 +24,7 @@ public static class AddLight
 
     public static void SetupCustomOption()
     {
-        SetupRoleOptions(Id, TabGroup.Addons, CustomRoles.AddLight);
+        SetupRoleOptions(Id, TabGroup.Addons, CustomRoles.AddLight, RoleColor);
         OptionAddCrewmateVision = FloatOptionItem.Create(79210, "AddLightAddCrewmateVision", new(0f, 5f, 0.1f), 0.3f, TabGroup.Addons, false)
             .SetValueFormat(OptionFormat.Multiplier).SetGameMode(CustomGameMode.Standard);
         OptionAddImpostorVision = FloatOptionItem.Create(79211, "AddLightAddImpostorVision", new(0f, 5f, 0.1f), 0.5f, TabGroup.Addons, false)

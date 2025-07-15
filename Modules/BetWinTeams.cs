@@ -22,7 +22,8 @@ namespace TownOfHostForE
         private static Dictionary<string, ShopData> ShopDataDic = new();
         public static List<string> winnerCode = new();
 
-        //private static readonly int maxData = 99999;
+        //ポイント最大値
+        private static readonly int maxPoint = 99999;
 
         public static OptionItem BetWinTeamMode;
         public static OptionItem VoteMaxPlayer;
@@ -217,7 +218,6 @@ namespace TownOfHostForE
         /// </summary>
         public static void JoinLobbySyougo()
         {
-            return;
             //ロビー限定
             if (!GameStates.IsLobby) return;
 
@@ -226,27 +226,83 @@ namespace TownOfHostForE
             {
                 _ = new LateTask(() =>
                 {
-                    foreach (var target in Main.AllPlayerControls)
+                    foreach (var seer in Main.AllPlayerControls)
                     {
                         //ホストは変更しない
-                        if (target.PlayerId == 0) continue;
-                        string targetName = target.name;
+                        if (seer.PlayerId == 0) continue;
 
-                        if (BetPoint.ContainsKey(target.FriendCode) &&
-                        BetPoint[target.FriendCode].Syougo != null &&
-                        BetPoint[target.FriendCode].Syougo != "")
+                        if (BetPoint.ContainsKey(seer.FriendCode) &&
+                        BetPoint[seer.FriendCode].Syougo != null &&
+                        BetPoint[seer.FriendCode].Syougo != "")
                         {
-                            string syogoData = BetPoint[target.FriendCode].Syougo;
-                            if (!targetName.Contains(syogoData))
+
+                            string seerName = seer.Data.PlayerName.Contains("\r\n") ? Utils.RemoveHtmlTags(Utils.RemoveRightString(seer.Data.PlayerName, "\r\n")) : seer.Data.PlayerName;
+
+                            string syogoData = BetPoint[seer.FriendCode].Syougo;
+
+                            //75%縮小がない奴(仕様変更周り)
+                            if (!syogoData.Contains("size=75%"))
                             {
-                                targetName += "\r\n" + BetPoint[target.FriendCode].Syougo;
-                                target.RpcSetName(targetName);
+                                syogoData = "<size=75%>" + syogoData + "</size>";
+                            }
+                            if (!seerName.Contains(syogoData))
+                            {
+                                //普通につけるとチャットに被るので中心を称号に上にずらす
+                                seerName += "\r\n" + syogoData;
+                                seerName = "<line-height=-100%>" + seerName + "</line-height>";
+
+                                seer.RpcSetName(seerName);
                             }
                         }
                     }
                 }, 1f, "LobbySetShogo");
             }
         }
+
+        /// <summary>
+        /// ロビーにJoinしてきたやつに称号を付ける
+        /// ロビーのみ有効
+        /// </summary>
+        public static void JoinLobbySyougo(PlayerControl seer)
+        {
+            //ホストのみ
+            if (!AmongUsClient.Instance.AmHost) return;
+
+            //ロビー限定
+            if (!GameStates.IsLobby) return;
+
+            //称号付けれたらつけるよ
+            if (BetWinTeamMode.GetBool() && !DisableShogo.GetBool())
+            {
+                //mod導入者は変更しない
+                if (seer = PlayerControl.LocalPlayer) return;
+
+                if (BetPoint.ContainsKey(seer.FriendCode) &&
+                BetPoint[seer.FriendCode].Syougo != null &&
+                BetPoint[seer.FriendCode].Syougo != "")
+                {
+                    string seerName = seer.Data.PlayerName.Contains("\r\n") ? Utils.RemoveHtmlTags(Utils.RemoveRightString(seer.Data.PlayerName, "\r\n")) : seer.Data.PlayerName;
+
+                    string syogoData = BetPoint[seer.FriendCode].Syougo;
+
+                    //75%縮小がない奴(仕様変更周り)
+                    if (!syogoData.Contains("size=75%"))
+                    {
+                        syogoData = "<size=75%>" + syogoData + "</size>";
+                    }
+                    if (!seerName.Contains(syogoData))
+                    {
+                        //普通につけるとチャットに被るので中心を称号に上にずらす
+                        seerName += "\r\n" + syogoData;
+                        seerName = "<line-height=-100%>" + seerName + "</line-height>";
+
+                        seer.RpcSetName(seerName);
+                    }
+                }
+            }
+        }
+
+
         public static void ReceiveRPC(MessageReader reader)
         {
             var count = reader.ReadInt32();
@@ -384,11 +440,11 @@ namespace TownOfHostForE
                             BetPoint[player.FriendCode].Syougo = "<size=75%>" + tempName + "</size>";
                             BetPoint[player.FriendCode].PlayerPoint -= 100;
                             //ストック処理
-                            SetKeepShogo(player.FriendCode, tempName);
+                            SetKeepShogo(player.FriendCode, "<size=75%>" + tempName + "</size>");
                             WriteCSVPlayerData();
 
                             Utils.SendMessage("称号に" + tempName + "を付けたよ。\r\nﾏｲﾄﾞｱﾘ！", player.PlayerId, "");
-                            JoinLobbySyougo();
+                            JoinLobbySyougo(player);
                         }
                         else
                         {
@@ -408,11 +464,11 @@ namespace TownOfHostForE
                             BetPoint[player.FriendCode].Syougo = "<size=75%>" + tempName + "</size>";
                             BetPoint[player.FriendCode].PlayerPoint -= ShopDataDic[subArgs].Price;
                             //ストック処理
-                            SetKeepShogo(player.FriendCode, tempName);
+                            SetKeepShogo(player.FriendCode, "<size=75%>" + tempName + "</size>");
                             WriteCSVPlayerData();
 
                             Utils.SendMessage("称号に" + tempName + "を付けたよ。\r\nﾏｲﾄﾞｱﾘ！", player.PlayerId, "");
-                            JoinLobbySyougo();
+                            JoinLobbySyougo(player);
                         }
                         else
                         {
@@ -477,7 +533,7 @@ namespace TownOfHostForE
 
                     SetShogoToKeep(player.FriendCode, targetNum);
                     Utils.SendMessage("称号を適用しました！", player.PlayerId, "");
-                    JoinLobbySyougo();
+                    JoinLobbySyougo(player);
                 }
                 catch
                 {
@@ -830,11 +886,15 @@ namespace TownOfHostForE
 
         public static string RemoveCrLf(string input)
         {
-            var tempinput = input;
-            tempinput.Replace("\r", "");
-            tempinput.Replace("\n", "");
+            string returnString = input;
 
-            return tempinput;
+            do
+            {
+                returnString.Replace("\r", "").Replace("\n", "");
+            }
+            while (returnString.Contains("\r") || returnString.Contains("\n"));
+
+            return returnString;
         }
         private static string getPlayerName(string FriendCode)
         {
@@ -1213,7 +1273,14 @@ namespace TownOfHostForE
                 if (BetPoint.ContainsKey(SetPlayer.Key))
                 {
                     BetPoint[SetPlayer.Key].AUName = RemoveCrLf(getPlayerName(SetPlayer.Key));
-                    BetPoint[SetPlayer.Key].PlayerPoint += PlusValue;
+                    if (BetPoint[SetPlayer.Key].PlayerPoint + PlusValue >= maxPoint)
+                    {
+                        BetPoint[SetPlayer.Key].PlayerPoint = maxPoint;
+                    }
+                    else
+                    {
+                        BetPoint[SetPlayer.Key].PlayerPoint += PlusValue;
+                    }
                 }
                 else
                 {
@@ -1274,8 +1341,15 @@ namespace TownOfHostForE
                 //まだ同意していないなら終了
                 if (!BetPoint.ContainsKey(friendCode)) continue;
                 if (!BetPoint[friendCode].Agree) continue;
-                //勝者には3点付与
-                BetPoint[friendCode].PlayerPoint += 3;
+                if (BetPoint[friendCode].PlayerPoint + 3 >= maxPoint)
+                {
+                    BetPoint[friendCode].PlayerPoint = maxPoint;
+                }
+                else
+                {
+                    //勝者には3点付与
+                    BetPoint[friendCode].PlayerPoint += 3;
+                }
                 Logger.Info("勝利した人にポイント付与：" + friendCode, "BETWIN");
                 //Utils.SendMessage("ゲームに勝利したため特別点3点が付与されました！", getFirendCodeToId(friendCode), "");
             }

@@ -204,7 +204,7 @@ public static void SetUpKillTargetOption(CustomRoles role, int idOffset, bool de
 
         float targetDistance = Vector2.Distance(GSpos, target.transform.position);
 
-        var KillRange = GameOptionsData.KillDistances[Mathf.Clamp(Main.NormalOptions.KillDistance, 0, 2)];
+        var KillRange = NormalGameOptionsV09.KillDistances[Mathf.Clamp(Main.NormalOptions.KillDistance, 0, 2)];
         if (targetDistance <= KillRange && Player.CanMove && target.CanMove)
         {
             ShotLimit--;

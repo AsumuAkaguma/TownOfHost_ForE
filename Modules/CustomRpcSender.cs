@@ -257,6 +257,7 @@ namespace TownOfHostForE
         {
             sender.AutoStartRpc(player.NetId, (byte)RpcCalls.SetRole, targetClientId)
                 .Write((ushort)role)
+                .Write(false)
                 .EndRpc();
         }
         public static void RpcMurderPlayer(this CustomRpcSender sender, PlayerControl player, PlayerControl target, int targetClientId = -1)
@@ -264,6 +265,26 @@ namespace TownOfHostForE
             sender.AutoStartRpc(player.NetId, (byte)RpcCalls.MurderPlayer, targetClientId)
                 .WriteNetObject(target)
                 .Write((int)ExtendedPlayerControl.SuccessFlags)
+                .EndRpc();
+        }
+        public static void RpcSetName(this CustomRpcSender sender, PlayerControl player, string name, PlayerControl seer = null)
+        {
+            var targetClientId = seer == null ? -1 : seer.GetClientId();
+            if (seer == null)
+            {
+                foreach (var seer2 in Main.AllPlayerControls)
+                {
+                    Main.LastNotifyNames[(player.PlayerId, seer2.PlayerId)] = name;
+                }
+            }
+            else
+            {
+                Main.LastNotifyNames[(player.PlayerId, seer.PlayerId)] = name;
+            }
+            sender.AutoStartRpc(player.NetId, (byte)RpcCalls.SetName, targetClientId)
+                .Write(player.Data.NetId)
+                .Write(name)
+                .Write(false)
                 .EndRpc();
         }
     }

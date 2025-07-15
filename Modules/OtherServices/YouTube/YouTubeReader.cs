@@ -4,11 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using TownOfHostForE.Attributes;
-using YoutubeLiveChatSharp;
 using UnityEngine;
 using TownOfHostForE.Roles.Crewmate;
 
-namespace TownOfHostForE
+namespace TownOfHostForE.Modules.OtherServices.YouTube
 {
     class YouTubeReader
     {
@@ -52,7 +51,7 @@ namespace TownOfHostForE
                     {
                         liveId = line;
                         chat = new ChatFetch(liveId);
-                        Logger.Info(liveId,"YouTube");
+                        Logger.Info(liveId, "YouTube");
                     }
                 }
                 Logger.Msg("YouTube読み取り終了", "YouTube");
@@ -72,15 +71,13 @@ namespace TownOfHostForE
                 UpdateTime -= Time.fixedDeltaTime;
                 if (UpdateTime < 0) UpdateTime = 0.5f; // 負荷軽減の為1秒ごとの更新
 
-                if (UpdateTime == 0.5f)
-                {
-                    Task task = Task.Run(getComment);
-                }
+                //if (UpdateTime == 0.5f)
+                //    Task task = Task.Run(getComment);
             }
             catch (Exception e)
             {
                 liveId = "";
-                Logger.Info("対象の配信を取得できませんでした。","YouTube");
+                Logger.Info("対象の配信を取得できませんでした。", "YouTube");
             }
         }
 
@@ -91,15 +88,13 @@ namespace TownOfHostForE
 
             if (!GameStates.IsLobby) return;
             foreach (var data in chatList)
-            {
                 ShowComment(data);
-            }
         }
 
         private static void ShowComment(Comment c)
         {
             Logger.Info($"name: {c.userName}\n" +
-                $"    message: {c.text}","YouTube");
+                $"    message: {c.text}", "YouTube");
 
             Logger.SendInGame("【" + c.userName + "】" + c.text);
         }

@@ -5,7 +5,7 @@ using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace YoutubeLiveChatSharp
+namespace TownOfHostForE.Modules.OtherServices.YouTube
 {
     public class ChatFetch
     {

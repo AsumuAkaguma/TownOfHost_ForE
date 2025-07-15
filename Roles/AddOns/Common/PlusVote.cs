@@ -15,7 +15,7 @@ public static class PlusVote
 
     public static void SetupCustomOption()
     {
-        SetupRoleOptions(Id, TabGroup.Addons, CustomRoles.PlusVote);
+        SetupRoleOptions(Id, TabGroup.Addons, CustomRoles.PlusVote, RoleColor);
     }
     [GameModuleInitializer]
     public static void Init()

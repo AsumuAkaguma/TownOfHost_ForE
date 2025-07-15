@@ -1,4 +1,7 @@
+using System.Linq;
 using System.Text;
+using UnityEngine;
+using AmongUs.GameOptions;
 
 namespace TownOfHostForE.Roles.Core.Descriptions;
 
@@ -21,17 +24,26 @@ public abstract class RoleDescription
     {
         get
         {
-            var builder = new StringBuilder(256);
+            //var builder = new StringBuilder(256);
+            var builder = new StringBuilder();
             // 役職名と説明文
             builder.AppendFormat("<size={0}>\n", BlankLineSize);
             builder.AppendFormat("<size={0}>{1}\n", FirstHeaderSize, Translator.GetRoleString(RoleInfo.RoleName.ToString()).Color(RoleInfo.RoleColor.ToReadableColor()));
-            builder.AppendFormat("<size={0}>{1}\n", BodySize, Description);
             // 陣営
-            builder.AppendFormat("<size={0}>\n", BlankLineSize);
-            builder.AppendFormat("<size={0}>{1}\n", SecondHeaderSize, Translator.GetString("Team"));
             //   マッドメイトはインポスター陣営
             var roleTeam = RoleInfo.CustomRoleType == CustomRoleTypes.Madmate ? CustomRoleTypes.Impostor : RoleInfo.CustomRoleType;
-            builder.AppendFormat("<size={0}>{1}\n", BodySize, Translator.GetString($"CustomRoleTypes.{roleTeam}"));
+            Color roleColor = RoleInfo.CustomRoleType == CustomRoleTypes.Crewmate ? Utils.GetRoleColor(CustomRoles.Crewmate) : Utils.GetRoleColor(RoleInfo.RoleName);
+            builder.AppendFormat("<size={0}>{1}\n", ThirdHeaderSize, $"陣営：{Utils.ColorString(roleColor,Translator.GetString($"CustomRoleTypes.{roleTeam}"))}");
+            builder.AppendFormat("<size={0}>\n", BlankLineSize);
+            builder.AppendFormat("<size={0}>{1}\n", BodySize, Description);
+            builder.AppendFormat("<size={0}>\n", BlankLineSize);
+            //設定
+            builder.AppendFormat("<size={0}>{1}\n", ThirdHeaderSize, $"【設定】");
+            foreach (var opt in Options.CustomRoleSpawnChances[RoleInfo.RoleName].Children.Select((v, i) => new { Value = v, Index = i + 1 }))
+            {
+                builder.Append($"{opt.Value.GetName(true).RemoveHtmlTags()}: {opt.Value.GetString()}\n");
+            }
+
             // バニラ役職判定
             builder.AppendFormat("<size={0}>\n", BlankLineSize);
             builder.AppendFormat("<size={0}>{1}\n", SecondHeaderSize, Translator.GetString("Basis"));
@@ -42,6 +54,7 @@ public abstract class RoleDescription
 
     public const string FirstHeaderSize = "130%";
     public const string SecondHeaderSize = "100%";
+    public const string ThirdHeaderSize = "80%";
     public const string BodySize = "70%";
     public const string BlankLineSize = "30%";
 }

@@ -13,6 +13,7 @@ using UnityEngine;
 using TownOfHostForE.Attributes;
 using TownOfHostForE.Roles.Core;
 using TownOfHostForE.Modules;
+using TownOfHostForE.Modules.OtherServices;
 
 [assembly: AssemblyFileVersionAttribute(TownOfHostForE.Main.PluginVersion)]
 [assembly: AssemblyInformationalVersionAttribute(TownOfHostForE.Main.PluginVersion)]
@@ -52,21 +53,43 @@ namespace TownOfHostForE
         // ==========
         //Sorry for many Japanese comments.
         public const string PluginGuid = "com.AsumuAkaguma.townofhostfore";
-        public const string PluginVersion = "516.4.0";
-        public const string PleviewPluginVersion = "Commemorative";
+        public const string PluginVersion = "5113.5.0.0";
+        public const string PleviewPluginVersion = "Degrade";
         // サポートされている最低のAmongUsバージョン
-        public static readonly string LowestSupportedVersion = "2024.03.05";
+        public static readonly string LowestSupportedVersion = "2025.04.20";
         // このバージョンのみで公開ルームを無効にする場合
         public static readonly bool IsPublicAvailableOnThisVersion = false;
+        // プレリリースかどうか
+        public static bool IsPrerelease { get; } = false;
         public Harmony Harmony { get; } = new Harmony(PluginGuid);
         public static Version version = Version.Parse(PluginVersion);
+        public static Color UnityModColor
+        {
+            get
+            {
+                if (!_unityModColor.HasValue)
+                {
+                    if (ColorUtility.TryParseHtmlString(ModColor, out var unityColor))
+                    {
+                        _unityModColor = unityColor;
+                    }
+                    else
+                    {
+                        // failure
+                        return Color.gray;
+                    }
+                }
+                return _unityModColor.Value;
+            }
+        }
+        private static Color? _unityModColor;
         public static BepInEx.Logging.ManualLogSource Logger;
         public static bool hasArgumentException = false;
         public static string ExceptionMessage;
         public static bool ExceptionMessageIsShown = false;
         public static string credentialsText;
-        public static NormalGameOptionsV07 NormalOptions => GameOptionsManager.Instance.currentNormalGameOptions;
-        public static HideNSeekGameOptionsV07 HideNSeekSOptions => GameOptionsManager.Instance.currentHideNSeekGameOptions;
+        public static NormalGameOptionsV09 NormalOptions => GameOptionsManager.Instance.currentNormalGameOptions;
+        public static HideNSeekGameOptionsV09 HideNSeekSOptions => GameOptionsManager.Instance.currentHideNSeekGameOptions;
         //Client Options
         public static ConfigEntry<string> HideName { get; private set; }
         public static ConfigEntry<string> HideColor { get; private set; }
@@ -101,16 +124,10 @@ namespace TownOfHostForE
         public static bool isChatCommand = false;
         public static Dictionary<byte, float> AllPlayerKillCooldown = new();
         public static List<PlayerControl> NotCrewAssignCount = new();
-        //public static List<PlayerControl> LoversPlayers = new();
-        //複数ラバーズ制作用。keyはラバーズ親のPlayerId
-        public static Dictionary<byte ,List<byte>> LoversPlayersV2 = new();
-        //public static bool isLoversDead = true;
-        //複数ラバーズ制作用。keyはラバーズ親のPlayerId
-        public static Dictionary<byte,bool> isLoversDeadV2;
-        //複数ラバーズ制作用。リーダーの登録順保持用
-        public static List<byte> isLoversLeaders;
         //プレイヤーのキルカウント数
         public static Dictionary<byte, int> killCount = new();
+        //シェイプをボタンにしてる人のID
+        public static HashSet<byte> shapeSwitchPlayerIds = new HashSet<byte>();
 
         /// <summary>
         /// 基本的に速度の代入は禁止.スピードは増減で対応してください.
@@ -123,7 +140,7 @@ namespace TownOfHostForE
         public static Dictionary<byte, byte> ShapeshiftTarget = new();
         public static bool VisibleTasksCount;
         public static string nickName = "";
-        public static bool introDestroyed = false;
+        public static bool isFirstTurn = false;
         public static float DefaultCrewmateVision;
         public static float DefaultImpostorVision;
         public static bool IsValentine = DateTime.Now.Month == 3 && DateTime.Now.Day is 9 or 10 or 11 or 12 or 13 or 14 or 15;
@@ -131,7 +148,7 @@ namespace TownOfHostForE
         public static bool IsAprilFool = DateTime.Now.Month == 4 && DateTime.Now.Day is 1 or 2 or 3;
         public static bool IsInitialRelease = DateTime.Now.Month == 11 && DateTime.Now.Day is 2;
         public static bool IsOneNightRelease = DateTime.Now.Month == 7;
-        public static bool IsForEPreRelease = DateTime.Now.Month == 4;
+        public static bool IsForEPreRelease = false;
         public static bool IsForEDay = DateTime.Now.Month == 4 || DateTime.Now.Day is 4 or 14 or 24;
         public const float RoleTextSize = 2f;
 
@@ -144,9 +161,15 @@ namespace TownOfHostForE
         public static int tempImpostorNum = 0;
         public static ConfigEntry<bool> EnableCustomSoundEffect { get; private set; }
         public static ConfigEntry<bool> EnableCustomBGMEffect { get; private set; }
+        public static ConfigEntry<bool> EnableBlueSkyPost { get; private set; }
+        public static PostBlueSky BlueSkyMain { get; private set; }
+
         public override void Load()
         {
             Instance = this;
+
+            //DLL読み込み
+            LoadDLL.OnLoadDLL();
 
             //Client Options
             HideName = Config.Bind("Client Options", "Hide Game Code Name", "Town Of Host ForE");
@@ -189,6 +212,10 @@ namespace TownOfHostForE
             EnableCustomSoundEffect = Config.Bind("Client Options", "EnableCustomSoundEffect", true);
 
             EnableCustomBGMEffect = Config.Bind("Client Options", "EnableCustomBGMEffect", true);
+
+            //青空関連
+            EnableBlueSkyPost = Config.Bind("Client Options", "EnableBlueSkyPost", false);
+            BlueSkyMain = new PostBlueSky(); 
 
             PluginModuleInitializerAttribute.InitializeAll();
 

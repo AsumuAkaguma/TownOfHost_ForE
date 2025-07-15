@@ -45,8 +45,8 @@ public sealed class Bakery : RoleBase
     }
     private static int ChangeChances;
 
-    public PlayerControl PoisonPlayer;
-    public static List<Bakery> nBakeries = new();
+    private PlayerControl PoisonPlayer;
+    private static List<Bakery> nBakeries = new();
 
     private static void SetupOptionItem()
     {

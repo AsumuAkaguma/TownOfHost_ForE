@@ -163,7 +163,7 @@ namespace TownOfHostForE
                                 {
                                     CustomWinnerHolder.WinnerIds.Add(player.PlayerId);
                                 }
-                                GameEndChecker.StartEndGame(GameOverReason.HumansByTask);
+                                GameEndChecker.StartEndGame(GameOverReason.CrewmatesByTask);
                                 break;
                             case "impostor":
                                 GameManager.Instance.enabled = false;
@@ -172,12 +172,12 @@ namespace TownOfHostForE
                                 {
                                     CustomWinnerHolder.WinnerIds.Add(player.PlayerId);
                                 }
-                                GameEndChecker.StartEndGame(GameOverReason.ImpostorByKill);
+                                GameEndChecker.StartEndGame(GameOverReason.ImpostorsByKill);
                                 break;
                             case "none":
                                 GameManager.Instance.enabled = false;
                                 CustomWinnerHolder.WinnerTeam = CustomWinner.None;
-                                GameEndChecker.StartEndGame(GameOverReason.ImpostorByKill);
+                                GameEndChecker.StartEndGame(GameOverReason.ImpostorsByKill);
                                 break;
                             case "jackal":
                                 GameManager.Instance.enabled = false;
@@ -186,7 +186,7 @@ namespace TownOfHostForE
                                 {
                                     CustomWinnerHolder.WinnerIds.Add(player.PlayerId);
                                 }
-                                GameEndChecker.StartEndGame(GameOverReason.ImpostorByKill);
+                                GameEndChecker.StartEndGame(GameOverReason.ImpostorsByKill);
                                 break;
                             case "animals":
                                 GameManager.Instance.enabled = false;
@@ -206,7 +206,7 @@ namespace TownOfHostForE
                                 {
                                     CustomWinnerHolder.WinnerIds.Add(player.PlayerId);
                                 }
-                                GameEndChecker.StartEndGame(GameOverReason.ImpostorByKill);
+                                GameEndChecker.StartEndGame(GameOverReason.ImpostorsByKill);
                                 break;
 
                             default:
@@ -223,7 +223,7 @@ namespace TownOfHostForE
                         {
                             case "crewmate":
                                 GameManager.Instance.enabled = false;
-                                GameManager.Instance.RpcEndGame(GameOverReason.HumansDisconnect, false);
+                                GameManager.Instance.RpcEndGame(GameOverReason.CrewmateDisconnect, false);
                                 break;
 
                             case "impostor":
@@ -354,7 +354,7 @@ namespace TownOfHostForE
                     case "/exile":
                         canceled = true;
                         if (args.Length < 2 || !int.TryParse(args[1], out int id)) break;
-                        Utils.GetPlayerById(id)?.RpcExileV2();
+                        Utils.GetPlayerById(id)?.RpcExile();
                         break;
 
                     case "/kill":
@@ -844,15 +844,17 @@ namespace TownOfHostForE
                 DestroyableSingleton<HudManager>.Instance.Chat.AddChat(player, msg);
                 player.SetName(name);
             }
-            var writer = CustomRpcSender.Create("MessagesToSend", SendOption.None);
+            var writer = CustomRpcSender.Create("MessagesToSend", SendOption.Reliable);
             writer.StartMessage(clientId);
             writer.StartRpc(player.NetId, (byte)RpcCalls.SetName)
+                .Write(player.Data.NetId)
                 .Write(title)
                 .EndRpc();
             writer.StartRpc(player.NetId, (byte)RpcCalls.SendChat)
                 .Write(msg)
                 .EndRpc();
             writer.StartRpc(player.NetId, (byte)RpcCalls.SetName)
+                .Write(player.Data.NetId)
                 .Write(player.Data.PlayerName)
                 .EndRpc();
             writer.EndMessage();
@@ -888,11 +890,11 @@ namespace TownOfHostForE
             chatText = new StringBuilder(chatText).Insert(0, "\n", return_count).ToString();
             if (AmongUsClient.Instance.AmClient && DestroyableSingleton<HudManager>.Instance)
                 DestroyableSingleton<HudManager>.Instance.Chat.AddChat(__instance, chatText);
-            if (chatText.IndexOf("who", StringComparison.OrdinalIgnoreCase) >= 0)
+            if (chatText.Contains("who", StringComparison.OrdinalIgnoreCase))
                 DestroyableSingleton<UnityTelemetry>.Instance.SendWho();
-            MessageWriter messageWriter = AmongUsClient.Instance.StartRpc(__instance.NetId, (byte)RpcCalls.SendChat, SendOption.None);
+            MessageWriter messageWriter = AmongUsClient.Instance.StartRpcImmediately(__instance.NetId, (byte)RpcCalls.SendChat, SendOption.Reliable);
             messageWriter.Write(chatText);
-            messageWriter.EndMessage();
+            AmongUsClient.Instance.FinishRpcImmediately(messageWriter);
             __result = true;
             return false;
         }

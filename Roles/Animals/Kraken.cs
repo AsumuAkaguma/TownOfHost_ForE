@@ -43,6 +43,7 @@ namespace TownOfHostForE.Roles.Animals
             setShokusyuTarget = false;
             killCount = 0;
             killNum = OptionKillNum.GetInt();
+            ShokusyuKun = new();
         }
         public SchrodingerCat.TeamType SchrodingerCatChangeTo => SchrodingerCat.TeamType.Animals;
 

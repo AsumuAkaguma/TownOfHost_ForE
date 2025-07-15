@@ -88,7 +88,7 @@ namespace TownOfHostForE.Modules
         }
 
 
-        public static void CreateButtonInfo(PlayerControl reporter, GameData.PlayerInfo target)
+        public static void CreateButtonInfo(PlayerControl reporter, NetworkedPlayerInfo target)
         {
             var reporterInfo = Utils.GetPlayerInfoById(reporter.PlayerId);
             var reporterColor = reporterInfo.Color;

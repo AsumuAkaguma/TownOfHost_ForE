@@ -35,6 +35,8 @@ namespace TownOfHostForE
         private static bool InitFinished = false;
         public static bool spBGM = false;
 
+
+
         // XAudio2関連
         private static XAudio2 xaDevice;
         // 全てのボイスデータを合成・生成して、マスターボイスとしてサウンドカードデバイスにデータを送るクラス
@@ -299,10 +301,10 @@ namespace TownOfHostForE
             MemoryStream httpStream = new (buffer);
 
             // WAVEファイルを読み込んで設定
-            using (SoundStream xaStream = new (httpStream))
+            using (SoundStream xaStream = new(httpStream))
             {
-                SourceVoice xaSource = new (xaDevice, xaStream.Format);
-                AudioBuffer xaBuffer = new ()
+                SourceVoice xaSource = new(xaDevice, xaStream.Format);
+                AudioBuffer xaBuffer = new()
                 {
                     // 読み込む容量
                     AudioBytes = (int)xaStream.Length,

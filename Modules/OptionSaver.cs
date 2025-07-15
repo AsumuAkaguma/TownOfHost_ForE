@@ -78,6 +78,8 @@ public static class OptionSaver
                 optionItem.SetAllValues(values);
             }
         }
+
+        //Utils.PrintMissingRanges(OptionItem._fastOptions);
     }
     /// <summary>現在のオプションをjsonファイルに保存</summary>
     public static void Save()

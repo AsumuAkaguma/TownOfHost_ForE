@@ -7,7 +7,7 @@ using TownOfHostForE.Roles.Core;
 using TownOfHostForE.Roles.Core.Interfaces;
 
 namespace TownOfHostForE.Roles.Impostor;
-public sealed class EvilDiviner : RoleBase, IImpostor
+public sealed class EvilDiviner : RoleBase, IImpostor, IDoubleTrigger
 {
     public static readonly SimpleRoleInfo RoleInfo =
          SimpleRoleInfo.Create(
@@ -86,14 +86,14 @@ public sealed class EvilDiviner : RoleBase, IImpostor
             enabled = true;
     }
 
-    public static bool OnCheckMurder(PlayerControl killer, PlayerControl target)
-    {
-        if (DivinationCount > 0)
-        {
-            return killer.CheckDoubleTrigger(target, () => { SetDivination(killer, target); });
-        }
-        else return true;
-    }
+    //public static bool OnCheckMurder(PlayerControl killer, PlayerControl target)
+    //{
+    //    if (DivinationCount > 0)
+    //    {
+    //        return killer.CheckDoubleTrigger(target, () => { SetDivination(killer, target); });
+    //    }
+    //    else return true;
+    //}
     public static void SetDivination(PlayerControl killer, PlayerControl target)
     {
         var killerId = killer.PlayerId;
@@ -108,5 +108,22 @@ public sealed class EvilDiviner : RoleBase, IImpostor
             //キルクールの適正化
             killer.SetKillCooldown();
         }
+    }
+    public bool SingleAction(PlayerControl killer, PlayerControl target)
+    {
+        if (DivinationCount > 0)
+        {
+            SetDivination(killer, target);
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+
+    public bool DoubleAction(PlayerControl killer, PlayerControl target)
+    {
+        return true;
     }
 }

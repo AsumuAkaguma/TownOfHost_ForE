@@ -59,9 +59,12 @@ namespace TownOfHostForE
                     RoleTypes.Crewmate => CustomRoles.Crewmate,
                     RoleTypes.Engineer => CustomRoles.Engineer,
                     RoleTypes.Scientist => CustomRoles.Scientist,
+                    RoleTypes.Noisemaker => CustomRoles.Noisemaker,
+                    RoleTypes.Tracker => CustomRoles.Tracker,
                     RoleTypes.GuardianAngel => CustomRoles.GuardianAngel,
                     RoleTypes.Impostor => CustomRoles.Impostor,
                     RoleTypes.Shapeshifter => CustomRoles.Shapeshifter,
+                    RoleTypes.Phantom => CustomRoles.Phantom,
                     _ => CustomRoles.Crewmate,
                 };
         }
@@ -213,6 +216,7 @@ namespace TownOfHostForE
     public static class GameStates
     {
         public static bool InGame = false;
+        public static bool InTask = false;
         public static bool AlreadyDied = false;
         public static bool IsModHost => PlayerControl.AllPlayerControls.ToArray().FirstOrDefault(x => x.PlayerId == 0 && x.IsModClient());
         public static bool IsLobby => AmongUsClient.Instance.GameState == AmongUsClient.GameStates.Joined;
@@ -222,7 +226,7 @@ namespace TownOfHostForE
         public static bool IsOnlineGame => AmongUsClient.Instance.NetworkMode == NetworkModes.OnlineGame;
         public static bool IsLocalGame => AmongUsClient.Instance.NetworkMode == NetworkModes.LocalGame;
         public static bool IsFreePlay => AmongUsClient.Instance.NetworkMode == NetworkModes.FreePlay;
-        public static bool IsInTask => InGame && !MeetingHud.Instance;
+        public static bool IsInTask => InTask;
         public static bool IsMeeting => InGame && MeetingHud.Instance;
         public static bool IsCountDown => GameStartManager.InstanceExists && GameStartManager.Instance.startState == GameStartManager.StartingStates.Countdown;
         public static bool IsShip => ShipStatus.Instance != null;
@@ -232,7 +236,7 @@ namespace TownOfHostForE
     public static class MeetingStates
     {
         public static DeadBody[] DeadBodies = null;
-        public static GameData.PlayerInfo ReportTarget = null;
+        public static NetworkedPlayerInfo ReportTarget = null;
         public static bool IsEmergencyMeeting => ReportTarget == null;
         public static bool IsExistDeadBody => DeadBodies.Length > 0;
         public static bool MeetingCalled = false;

@@ -27,6 +27,7 @@ namespace TownOfHostForE
                 if (task.TaskType == TaskTypes.UploadData && Options.DisableUploadData.GetBool()) disabledTasks.Add(task);//アップロードタスク
                 if (task.TaskType == TaskTypes.StartReactor && Options.DisableStartReactor.GetBool()) disabledTasks.Add(task);//リアクターの3x3タスク
                 if (task.TaskType == TaskTypes.ResetBreakers && Options.DisableResetBreaker.GetBool()) disabledTasks.Add(task);//レバータスク
+                if (task.TaskType == TaskTypes.FixWeatherNode && Options.DisableFixWeatherNode.GetBool()) disabledTasks.Add(task);//気象ノードタスク
             }
             foreach (var task in disabledTasks)
             {
@@ -36,14 +37,13 @@ namespace TownOfHostForE
         }
     }
 
-    [HarmonyPatch(typeof(GameData), nameof(GameData.RpcSetTasks))]
+    [HarmonyPatch(typeof(NetworkedPlayerInfo), nameof(NetworkedPlayerInfo.RpcSetTasks))]
     class RpcSetTasksPatch
     {
         //タスクを割り当ててRPCを送る処理が行われる直前にタスクを上書きするPatch
         //バニラのタスク割り当て処理自体には干渉しない
-        public static void Prefix(GameData __instance,
-        [HarmonyArgument(0)] byte playerId,
-        [HarmonyArgument(1)] ref Il2CppStructArray<byte> taskTypeIds)
+        public static void Prefix(NetworkedPlayerInfo __instance,
+        [HarmonyArgument(0)] ref Il2CppStructArray<byte> taskTypeIds)
         {
             //null対策
             if (Main.RealOptionsData == null)
@@ -52,7 +52,7 @@ namespace TownOfHostForE
                 return;
             }
 
-            var pc = Utils.GetPlayerById(playerId);
+            var pc = __instance.Object;
             CustomRoles? RoleNullable = pc?.GetCustomRole();
             if (RoleNullable == null) return;
             CustomRoles role = RoleNullable.Value;

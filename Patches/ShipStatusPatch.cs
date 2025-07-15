@@ -20,7 +20,7 @@ namespace TownOfHostForE
             //ここより上、全員が実行する
             if (!AmongUsClient.Instance.AmHost) return;
             //ここより下、ホストのみが実行する
-            if ((Options.CurrentGameMode == CustomGameMode.HideAndSeek || Options.IsStandardHAS) && Main.introDestroyed)
+            if ((Options.CurrentGameMode == CustomGameMode.HideAndSeek || Options.IsStandardHAS) && Main.isFirstTurn)
             {
                 if (Options.HideAndSeekKillDelayTimer > 0)
                 {
@@ -55,8 +55,10 @@ namespace TownOfHostForE
             [HarmonyArgument(1)] PlayerControl player,
             [HarmonyArgument(2)] byte amount)
         {
-            Logger.Info("SystemType: " + systemType.ToString() + ", PlayerName: " + player.GetNameWithRole() + ", amount: " + amount, "RepairSystem");
-
+            if (systemType != SystemTypes.Sabotage)
+            {
+                Logger.Info("SystemType: " + systemType.ToString() + ", PlayerName: " + player.GetNameWithRole() + ", amount: " + amount, "UpdateSystem");
+            }
             if (RepairSender.enabled && AmongUsClient.Instance.NetworkMode != NetworkModes.OnlineGame)
             {
                 Logger.SendInGame("SystemType: " + systemType.ToString() + ", PlayerName: " + player.GetNameWithRole() + ", amount: " + amount);
@@ -127,7 +129,7 @@ namespace TownOfHostForE
     [HarmonyPatch(typeof(ShipStatus), nameof(ShipStatus.StartMeeting))]
     class StartMeetingPatch
     {
-        public static void Prefix(ShipStatus __instance, PlayerControl reporter, GameData.PlayerInfo target)
+        public static void Prefix(ShipStatus __instance, PlayerControl reporter, NetworkedPlayerInfo target)
         {
             MeetingStates.ReportTarget = target;
             MeetingStates.DeadBodies = UnityEngine.Object.FindObjectsOfType<DeadBody>();

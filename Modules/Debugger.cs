@@ -9,23 +9,6 @@ using TownOfHostForE.Modules;
 
 namespace TownOfHostForE
 {
-    //class Webhook
-    //{
-    //    public static void Send(string text)
-    //    {
-    //        if (Main.WebhookURL.Value == "none") return;
-    //        HttpClient httpClient = new();
-    //        Dictionary<string, string> strs = new()
-    //        {
-    //            { "content", text },
-    //            { "username", "TownOfHost-Debugger" },
-    //            { "avatar_url", "https://cdn.discordapp.com/avatars/336095904320716800/95243b1468018a24f7ae03d7454fd5f2.webp?size=40" }
-    //        };
-    //        TaskAwaiter<HttpResponseMessage> awaiter = httpClient.PostAsync(
-    //            Main.WebhookURL.Value, new FormUrlEncodedContent(strs)).GetAwaiter();
-    //        awaiter.GetResult();
-    //    }
-    //}
     class Logger
     {
         public static bool isEnable;
@@ -45,7 +28,7 @@ namespace TownOfHostForE
         public static void SendInGame(string text, bool isAlways = false)
         {
             if (!isEnable) return;
-            if (DestroyableSingleton<HudManager>._instance) DestroyableSingleton<HudManager>.Instance.Notifier.AddItem(text);
+            if (DestroyableSingleton<HudManager>._instance) DestroyableSingleton<HudManager>.Instance.Notifier.AddDisconnectMessage(text);
         }
         private static void SendToFile(string text, LogLevel level = LogLevel.Info, string tag = "", bool escapeCRLF = true, int lineNumber = 0, string fileName = "")
         {

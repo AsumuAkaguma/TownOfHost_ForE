@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using TownOfHostForE.Attributes;
+using TownOfHostForE.Modules;
 using TownOfHostForE.Roles.AddOns.Common;
 
 namespace TownOfHostForE.GameMode;
@@ -165,7 +166,7 @@ public static class WordLimit
         {
             //キルではなくつる(死体発生対策)
             Utils.REIKAITENSOU(target.PlayerId,CustomDeathReason.wordLimit);
-            FixedUpdatePatch.LoversSuicide(target.PlayerId, true);
+            LoversManager.LoversSuicide(target.PlayerId, true);
         }, 0.25f, "WordLimitDeath");
     }
 }

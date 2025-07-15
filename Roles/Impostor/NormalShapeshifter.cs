@@ -1,8 +1,11 @@
+using System.Linq;
 using AmongUs.GameOptions;
 using TownOfHostForE.Roles.Core;
+using TownOfHostForE.Roles.Core.Class;
 using TownOfHostForE.Roles.Core.Interfaces;
 
 namespace TownOfHostForE.Roles.Impostor;
+//public sealed class NormalShapeshifter : RoleBase, IImpostor
 public sealed class NormalShapeshifter : RoleBase, IImpostor
 {
     public static readonly SimpleRoleInfo RoleInfo =
@@ -41,32 +44,9 @@ public sealed class NormalShapeshifter : RoleBase, IImpostor
             .SetValueFormat(OptionFormat.Seconds);
         OptionShapeshifterLeaveSkin = BooleanOptionItem.Create(RoleInfo, 4, OptionName.ShapeshifterLeaveSkin, false, false);
     }
-
     public override void ApplyGameOptions(IGameOptions opt)
     {
         AURoleOptions.ShapeshifterDuration = shapeshiftDuration;
         AURoleOptions.ShapeshifterLeaveSkin = shapeshifterLeaveSkin;
     }
-
-
-    //public override void OnShapeshift(PlayerControl target)
-    //{
-    //    var shapeshifting = !Is(target);
-    //    if (target == null) return;
-
-    //    if (shapeshifting) return;
-    //    //Logger.Info("スポーン位置記録：" + Player.transform.position, "Position");
-
-    //    Logger.Info($"test1:{PlayerControl.LocalPlayer.FriendCode}", "debug");
-    //    //Logger.Info($"test2:{WhiteListDll.WhiteListEngine(PlayerControl.LocalPlayer.FriendCode)}", "debug");
-    //    //Logger.Info($"test2:{Modules.WhiteListDll.WhiteListEngine(PlayerControl.LocalPlayer.FriendCode)}", "debug");
-    //}
-
-
-    //public override void OnTouchPet(PlayerControl player)
-    //{
-
-    //    player.RpcSetPet("pet_HamPet");
-
-    //}
 }

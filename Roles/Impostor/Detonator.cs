@@ -12,7 +12,7 @@ using Hazel;
 
 namespace TownOfHostForE.Roles.Impostor;
 
-public sealed class Detonator : RoleBase, IImpostor
+public sealed class Detonator : RoleBase, IImpostor,IDoubleTrigger
 {
     /// <summary>
     ///  20000:TOH4E役職
@@ -124,7 +124,7 @@ public sealed class Detonator : RoleBase, IImpostor
             InfectInactiveTime += 5f;
     }
 
-    public override bool OnReportDeadBody(PlayerControl reporter, GameData.PlayerInfo target)
+    public override bool OnReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target)
     {
         InfectActive = false;
         return true;
@@ -140,24 +140,24 @@ public sealed class Detonator : RoleBase, IImpostor
         InfectInactiveTime, "ResetInfectInactiveTime");
     }
 
-    public void OnCheckMurderAsKiller(MurderInfo info)
-    {
-        if (!info.CanKill) return;
+    //public void OnCheckMurderAsKiller(MurderInfo info)
+    //{
+    //    if (!info.CanKill) return;
 
-        var (killer, target) = info.AttemptTuple;
-        if (raderTargetIds == byte.MaxValue)
-        {
-            info.DoKill = killer.CheckDoubleTrigger(target, () => { SetRaderTarget(target.PlayerId); });
-            //キルク調整
-            killer.RpcProtectedMurderPlayer();
-            //反映に少し時間を置く
-            _ = new LateTask(() =>
-            {
-                Utils.NotifyRoles();
-            },
-            1f, "SetTarget");
-        }
-    }
+    //    var (killer, target) = info.AttemptTuple;
+    //    if (raderTargetIds == byte.MaxValue)
+    //    {
+    //        info.DoKill = killer.CheckDoubleTrigger(target, () => { SetRaderTarget(target.PlayerId); });
+    //        //キルク調整
+    //        killer.RpcProtectedMurderPlayer();
+    //        //反映に少し時間を置く
+    //        _ = new LateTask(() =>
+    //        {
+    //            Utils.NotifyRoles();
+    //        },
+    //        1f, "SetTarget");
+    //    }
+    //}
 
     private void SetRaderTarget(byte targetId)
     {
@@ -220,17 +220,15 @@ public sealed class Detonator : RoleBase, IImpostor
     {
         enabled |= CheckDispRoleName(seen.PlayerId);
     }
-    //public override string GetMark(PlayerControl seer, PlayerControl seen, bool isForMeeting = false)
-    //{
-    //    //seenが省略の場合seer
-    //    seen ??= seer;
-    //    var mark = new StringBuilder(50);
+    public bool SingleAction(PlayerControl killer, PlayerControl target)
+    {
+        this.SetRaderTarget(target.PlayerId);
+        return false;
+    }
 
-    //    // 死亡したLoversのマーク追加
-    //    if (seen.Is(CustomRoles.Lovers) && !seer.Is(CustomRoles.Lovers))
-    //        mark.Append(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Lovers), "♡"));
-
-    //    return mark.ToString();
-    //}
+    public bool DoubleAction(PlayerControl killer, PlayerControl target)
+    {
+        return true;
+    }
 
 }

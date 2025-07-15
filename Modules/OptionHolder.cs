@@ -13,6 +13,7 @@ using TownOfHostForE.Roles.AddOns.Impostor;
 using TownOfHostForE.Roles.AddOns.Crewmate;
 using TownOfHostForE.Roles.AddOns.NotCrew;
 using TownOfHostForE.GameMode;
+using TownOfHostForE.Modules.OptionItems;
 using static TownOfHostForE.GameMode.WordLimit;
 using static TownOfHostForE.Roles.Crewmate.Tiikawa;
 using static Il2CppSystem.Uri;
@@ -58,7 +59,7 @@ namespace TownOfHostForE
         public static OptionItem GameMode;
         //public static CustomGameMode CurrentGameMode => (CustomGameMode)GameMode.GetValue();
         //public static CustomGameMode CurrentGameMode => GameMode.CurrentValue == 0 ? CustomGameMode.Standard : CustomGameMode.HideAndSeek;
-        public static CustomGameMode CurrentGameMode => GameMode.CurrentValue == 0 ?  CustomGameMode.Standard : GameMode.CurrentValue == 1 ? CustomGameMode.HideAndSeek : CustomGameMode.SuperBombParty;
+        public static CustomGameMode CurrentGameMode => GameMode.CurrentValue == 0 ? CustomGameMode.Standard : GameMode.CurrentValue == 1 ? CustomGameMode.HideAndSeek : CustomGameMode.SuperBombParty;
 
         public static readonly string[] gameModes =
         {
@@ -89,6 +90,7 @@ namespace TownOfHostForE
         // 各役職の詳細設定
         public static OptionItem EnableGM;
         public static float DefaultKillCooldown = Main.NormalOptions?.KillCooldown ?? 20;
+        public static OptionItem DoubleTriggerThreshold;
         public static OptionItem DefaultShapeshiftCooldown;
         public static OptionItem ImpostorOperateVisibility;
         public static OptionItem CanMakeMadmateCount;
@@ -121,6 +123,7 @@ namespace TownOfHostForE
         public static OptionItem DisableUploadData;
         public static OptionItem DisableStartReactor;
         public static OptionItem DisableResetBreaker;
+        public static OptionItem DisableFixWeatherNode;
 
         //デバイスブロック
         public static OptionItem DisableDevices;
@@ -362,6 +365,8 @@ namespace TownOfHostForE
         public static OptionItem ChangeIntro;
         public static OptionItem AddonShow;
 
+        public static OptionItem FixSpawnPacketSize;
+
         public static int SnitchExposeTaskLeft = 1;
 
         public static readonly string[] addonShowModes =
@@ -424,6 +429,10 @@ namespace TownOfHostForE
         {
             if (IsLoaded) return;
             OptionSaver.Initialize();
+            //9人以上部屋で落ちる現象の対策
+            FixSpawnPacketSize = BooleanOptionItem.Create(1_000_200, "FixSpawnPacketSize", false, TabGroup.MainSettings, true)
+                .SetColor(new Color32(255, 255, 0, 255))
+                .SetGameMode(CustomGameMode.All);
 
             // プリセット
             _ = PresetOptionItem.Create(0, TabGroup.MainSettings)
@@ -450,7 +459,6 @@ namespace TownOfHostForE
             WordLimitOptions = StringOptionItem.Create(25_001_001, "WordLimit", wordLimitMode, 0, TabGroup.MainSettings, true)
                 .SetColor(Color.yellow)
                 .SetGameMode(CustomGameMode.Standard);
-            RoleAssignManager.SetupOptionItem();
             BetWinTeams.SetupCustomOption();
             #endregion
 
@@ -464,6 +472,8 @@ namespace TownOfHostForE
                 .SetColor(new Color32(255, 91, 112, 255))
                 .SetHeader(true)
                 .SetGameMode(CustomGameMode.Standard);
+
+            RoleAssignManager.SetupOptionItem();
             // Impostor
 
             SetupRoleOptions(CustomRoleManager.AllRolesInfo[CustomRoles.Impostor]);
@@ -482,6 +492,9 @@ namespace TownOfHostForE
                 info.OptionCreator?.Invoke();
             });
 
+            DoubleTriggerThreshold = FloatOptionItem.Create(90080, "DoubleTriggerThreashould", new(0.3f, 1f, 0.1f), 0.5f, TabGroup.ImpostorRoles, false)
+                .SetHeader(true)
+                .SetValueFormat(OptionFormat.Seconds);
 
             DefaultShapeshiftCooldown = FloatOptionItem.Create(90100, "DefaultShapeshiftCooldown", new(5f, 999f, 5f), 15f, TabGroup.ImpostorRoles, false)
                 .SetHeader(true)
@@ -526,16 +539,16 @@ namespace TownOfHostForE
             {
                 //ｸﾞｯﾊﾞｲちいかわ！
                 if (info.RoleName != CustomRoles.Tiikawa &&
-                    info.RoleName != CustomRoles.Metaton )
+                    info.RoleName != CustomRoles.Metaton)
                 {
                     switch (info.RoleName)
                     {
                         case CustomRoles.Sympathizer: //共鳴者は2人固定
                             SetupSingleRoleOptions(info.ConfigId, info.Tab, info.RoleName, 2);
                             break;
-                        case CustomRoles.Bakery: //パン屋一人固定
-                            SetupSingleRoleOptions(info.ConfigId, info.Tab, info.RoleName, 1);
-                            break;
+                        //case CustomRoles.Bakery: //パン屋一人固定
+                        //    SetupSingleRoleOptions(info.ConfigId, info.Tab, info.RoleName, 1);
+                        //    break;
                         default:
                             SetupRoleOptions(info);
                             break;
@@ -567,18 +580,18 @@ namespace TownOfHostForE
                 if (info.RoleName != CustomRoles.LawTracker &&
                     info.RoleName != CustomRoles.BAKURETSUKI &&
                     info.RoleName != CustomRoles.OwnerChef)
+                {
+                    switch (info.RoleName)
                     {
-                        switch (info.RoleName)
-                        {
-                            case CustomRoles.Jackal: //ジャッカルは1人固定
-                                SetupSingleRoleOptions(info.ConfigId, info.Tab, info.RoleName, 1);
-                                break;
-                            default:
-                                SetupRoleOptions(info);
-                                break;
-                        }
-                        info.OptionCreator?.Invoke();
+                        case CustomRoles.Jackal: //ジャッカルは1人固定
+                            SetupSingleRoleOptions(info.ConfigId, info.Tab, info.RoleName, 1);
+                            break;
+                        default:
+                            SetupRoleOptions(info);
+                            break;
                     }
+                    info.OptionCreator?.Invoke();
+                }
             });
 
             sortedRoleInfo.Where(role => role.CustomRoleType == CustomRoleTypes.Animals).Do(info =>
@@ -589,8 +602,9 @@ namespace TownOfHostForE
             });
 
             // Add-Ons
-            SetupSingleRoleOptions(73000, TabGroup.Addons, CustomRoles.Lovers, 2);
-            LoversAddWin = BooleanOptionItem.Create(73010, "LoversAddWin", false, TabGroup.Addons, false).SetParent(CustomRoleSpawnChances[CustomRoles.Lovers]);
+            //SetupSingleRoleOptions(73000, TabGroup.Addons, CustomRoles.Lovers, 2);
+            //LoversAddWin = BooleanOptionItem.Create(73010, "LoversAddWin", false, TabGroup.Addons, false).SetParent(CustomRoleSpawnChances[CustomRoles.Lovers]);
+            LoversManager.SetupCustomOption();
             LastImpostor.SetupCustomOption();
             CompreteCrew.SetupCustomOption();
             Workhorse.SetupCustomOption();
@@ -630,8 +644,8 @@ namespace TownOfHostForE
 
             // HideAndSeek
             /********************************************************************************/
-            SetupRoleOptions(200000, TabGroup.MainSettings, CustomRoles.HASFox, customGameMode: CustomGameMode.HideAndSeek);
-            SetupRoleOptions(200100, TabGroup.MainSettings, CustomRoles.HASTroll, customGameMode: CustomGameMode.HideAndSeek);
+            SetupRoleOptions(200000, TabGroup.MainSettings, CustomRoles.HASFox, Utils.GetRoleColor(CustomRoles.HASFox), customGameMode: CustomGameMode.HideAndSeek);
+            SetupRoleOptions(200100, TabGroup.MainSettings, CustomRoles.HASTroll, Utils.GetRoleColor(CustomRoles.HASTroll), customGameMode: CustomGameMode.HideAndSeek);
             AllowCloseDoors = BooleanOptionItem.Create(201000, "AllowCloseDoors", false, TabGroup.MainSettings, false)
                 .SetHeader(true)
                 .SetGameMode(CustomGameMode.HideAndSeek);
@@ -725,7 +739,7 @@ namespace TownOfHostForE
             // 初手キルクール調整
             FixFirstKillCooldown = BooleanOptionItem.Create(1_001_020, "FixFirstKillCooldown", false, TabGroup.MainSettings, false)
                 .SetColor(Palette.Orange);
-#endregion
+            #endregion
 
             #region サボ設定
             //TextOptionItem.Create(10_0002, "Head.Sabotage", TabGroup.MainSettings).SetColor(Color.yellow).SetGameMode(CustomGameMode.All);
@@ -753,7 +767,7 @@ namespace TownOfHostForE
                 .SetGameMode(CustomGameMode.Standard);
             // 停電の特殊設定
             LightsOutSpecialSettings = BooleanOptionItem.Create(100210, "LightsOutSpecialSettings", false, TabGroup.MainSettings, false)
-                .SetColor(Color.magenta).SetGameMode(CustomGameMode.Standard);;
+                .SetColor(Color.magenta).SetGameMode(CustomGameMode.Standard); ;
             DisableAirshipViewingDeckLightsPanel = BooleanOptionItem.Create(100211, "DisableAirshipViewingDeckLightsPanel", false, TabGroup.MainSettings, false).SetParent(LightsOutSpecialSettings)
                 .SetGameMode(CustomGameMode.Standard);
             DisableAirshipGapRoomLightsPanel = BooleanOptionItem.Create(100212, "DisableAirshipGapRoomLightsPanel", false, TabGroup.MainSettings, false).SetParent(LightsOutSpecialSettings)
@@ -766,7 +780,7 @@ namespace TownOfHostForE
             //コミュサボカモフラージュ
             CommsCamouflage = BooleanOptionItem.Create(100220, "CommsCamouflage", false, TabGroup.MainSettings, false)
                 .SetColor(Color.magenta);
-#endregion
+            #endregion
 
             #region 会議設定
             //TextOptionItem.Create(10_0003, "Head.Meeting", TabGroup.MainSettings).SetColor(Color.yellow).SetGameMode(CustomGameMode.All);
@@ -837,12 +851,14 @@ namespace TownOfHostForE
             DisableUploadData = BooleanOptionItem.Create(100404, "DisableUploadDataTask", false, TabGroup.MainSettings, false).SetParent(DisableTasks);
             DisableStartReactor = BooleanOptionItem.Create(100405, "DisableStartReactorTask", false, TabGroup.MainSettings, false).SetParent(DisableTasks);
             DisableResetBreaker = BooleanOptionItem.Create(100406, "DisableResetBreakerTask", false, TabGroup.MainSettings, false).SetParent(DisableTasks);
+            DisableFixWeatherNode = BooleanOptionItem.Create(100407, "DisableFixWeatherNodeTask", false, TabGroup.MainSettings, false).SetParent(DisableTasks)
+                            .SetGameMode(CustomGameMode.All);
 
             // タスク勝利無効化
             DisableTaskWin = BooleanOptionItem.Create(1_001_000, "DisableTaskWin", false, TabGroup.MainSettings, false)
                 .SetColor(Color.green)
                 .SetGameMode(CustomGameMode.Standard);
-#endregion
+            #endregion
 
             #region 幽霊設定
             //TextOptionItem.Create(10_0004, "Head.Ghost", TabGroup.MainSettings).SetColor(Color.yellow).SetGameMode(CustomGameMode.All);
@@ -860,7 +876,7 @@ namespace TownOfHostForE
             GhostCanSeeDeathReason = BooleanOptionItem.Create(1_001_014, "GhostCanSeeDeathReason", false, TabGroup.MainSettings, false)
                 .SetColor(Palette.LightBlue)
                 .SetGameMode(CustomGameMode.Standard);
-#endregion
+            #endregion
 
             #region システム
             //TextOptionItem.Create(10_0005, "Head.System", TabGroup.MainSettings).SetColor(Color.yellow).SetGameMode(CustomGameMode.All);
@@ -918,18 +934,17 @@ namespace TownOfHostForE
                             or "ApplyBanList"
                             or "ChangeIntro";
         }
-        public static void SetupRoleOptions(SimpleRoleInfo info) =>
-            SetupRoleOptions(info.ConfigId, info.Tab, info.RoleName, info.AssignInfo.AssignCountRule);
-        public static void SetupRoleOptions(int id, TabGroup tab, CustomRoles role, IntegerValueRule assignCountRule = null, CustomGameMode customGameMode = CustomGameMode.Standard)
+        public static void SetupRoleOptions(SimpleRoleInfo info) => SetupRoleOptions(info.ConfigId, info.Tab, info.RoleName, info.RoleColor, info.AssignInfo.AssignCountRule);
+        public static void SetupRoleOptions(int id, TabGroup tab, CustomRoles role, Color roleColor, IntegerValueRule assignCountRule = null, CustomGameMode customGameMode = CustomGameMode.Standard)
         {
             if (role.IsVanilla()) return;
             assignCountRule ??= new(1, 15, 1);
 
-            var spawnOption = IntegerOptionItem.Create(id, role.ToString(), new(0, 100, 10), 0, tab, false).SetColor(Utils.GetRoleColor(role))
-                .SetColor(Utils.GetRoleColor(role))
+            var spawnOption = new RoleSpawnChanceOptionItem(id, role.ToString(), 0, tab, false, new(0, 100, 10), role, roleColor);
+            spawnOption.SetColor(Utils.GetRoleColor(role))
                 .SetValueFormat(OptionFormat.Percent)
                 .SetHeader(true)
-                .SetGameMode(customGameMode) as IntegerOptionItem;
+                .SetGameMode(customGameMode);
             var countOption = IntegerOptionItem.Create(id + 1, "Maximum", assignCountRule, assignCountRule.Step, tab, false)
                 .SetParent(spawnOption)
                 .SetValueFormat(OptionFormat.Players)
@@ -1012,7 +1027,7 @@ namespace TownOfHostForE
                 this.IdStart = idStart;
                 this.Role = role;
 
-                if(option == null) option = CustomRoleSpawnChances[role];
+                if (option == null) option = CustomRoleSpawnChances[role];
                 Dictionary<string, string> replacementDic = new() { { "%role%", Utils.GetRoleName(role) } };
                 doOverride = BooleanOptionItem.Create(idStart++, "doOverride", false, tab, false).SetParent(option)
                     .SetValueFormat(OptionFormat.None);

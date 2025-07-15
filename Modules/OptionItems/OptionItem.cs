@@ -11,6 +11,20 @@ namespace TownOfHostForE
         #region static
         public static IReadOnlyList<OptionItem> AllOptions => _allOptions;
         private static List<OptionItem> _allOptions = new(1024);
+        public static IReadOnlyList<OptionItem> MainOptions => _mainOptions;
+        private static List<OptionItem> _mainOptions = new(512);
+        public static IReadOnlyList<OptionItem> ImpostorRoleOptions => _impostorRoleOptions;
+        private static List<OptionItem> _impostorRoleOptions = new(512);
+        public static IReadOnlyList<OptionItem> MadmateRoleOptions => _madmateRoleOptions;
+        private static List<OptionItem> _madmateRoleOptions = new(512);
+        public static IReadOnlyList<OptionItem> CrewmateRoleOptions => _crewmateRoleOptions;
+        private static List<OptionItem> _crewmateRoleOptions = new(512);
+        public static IReadOnlyList<OptionItem> NeutralRoleOptions => _neutralRoleOptions;
+        private static List<OptionItem> _neutralRoleOptions = new(512);
+        public static IReadOnlyList<OptionItem> AnimalsRoleOptions => _animalsRoleOptions;
+        private static List<OptionItem> _animalsRoleOptions = new(512);
+        public static IReadOnlyList<OptionItem> AddOnOptions => _addOnOptions;
+        private static List<OptionItem> _addOnOptions = new(512);
         public static IReadOnlyDictionary<int, OptionItem> FastOptions => _fastOptions;
         private static Dictionary<int, OptionItem> _fastOptions = new(1024);
         public static int CurrentPreset { get; set; }
@@ -58,7 +72,7 @@ namespace TownOfHostForE
         public OptionItem Parent { get; private set; }
         public List<OptionItem> Children;
 
-        public OptionBehaviour OptionBehaviour;
+        public StringOption OptionBehaviour;
 
         // イベント
         // eventキーワードにより、クラス外からのこのフィールドに対する以下の操作は禁止されます。
@@ -109,6 +123,17 @@ namespace TownOfHostForE
             if (_fastOptions.TryAdd(id, this))
             {
                 _allOptions.Add(this);
+                switch (tab)
+                {
+                    case TabGroup.MainSettings: _mainOptions.Add(this); break;
+                    case TabGroup.ImpostorRoles: _impostorRoleOptions.Add(this); break;
+                    case TabGroup.MadmateRoles: _madmateRoleOptions.Add(this); break;
+                    case TabGroup.CrewmateRoles: _crewmateRoleOptions.Add(this); break;
+                    case TabGroup.NeutralRoles: _neutralRoleOptions.Add(this); break;
+                    case TabGroup.AnimalsRoles: _animalsRoleOptions.Add(this); break;
+                    case TabGroup.Addons: _addOnOptions.Add(this); break;
+                    default: Logger.Warn($"Encountered unknown option category \"{tab}\" (ID: {id}, Name: {name})", nameof(OptionItem)); break;
+                }
             }
             else
             {
@@ -118,7 +143,6 @@ namespace TownOfHostForE
                 Logger.Error($"ID:{id}が重複しています", "OptionItem");
             }
         }
-
         // Setter
         public OptionItem Do(Action<OptionItem> action)
         {

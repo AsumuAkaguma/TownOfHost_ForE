@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 using TownOfHostForE.Roles.Core;
 using TownOfHostForE.Roles.Core.Interfaces;
+using TownOfHostForE.Modules;
 
 namespace TownOfHostForE.Roles.Neutral;
 
@@ -27,11 +28,7 @@ public sealed class OtakuPrincess : RoleBase, IKiller
             "姫",
             "#ff6be4",
             true,
-            countType: CountTypes.Crew,
-            assignInfo: new RoleAssignInfo(CustomRoles.OtakuPrincess, CustomRoleTypes.Neutral)
-            {
-                AssignCountRule = new(1, 1, 1)
-            }
+            countType: CountTypes.Crew
         );
     public OtakuPrincess(PlayerControl player)
     : base(
@@ -39,15 +36,13 @@ public sealed class OtakuPrincess : RoleBase, IKiller
         player
     )
     {
-        //Main.isLoversDead = false;
-        //Main.LoversPlayers.Clear();
         killCool = KillCool.GetInt();
         isFirstSetting = false;
     }
     public static OptionItem PrinceMax;
     public static OptionItem KillCool;
 
-    int princeMax;
+    public int princeMax;
     static int killCool;
     static bool isFirstSetting = false;
 
@@ -82,56 +77,73 @@ public sealed class OtakuPrincess : RoleBase, IKiller
     public override void ApplyGameOptions(IGameOptions opt) => opt.SetVision(false);
     public void OnCheckMurderAsKiller(MurderInfo info)
     {
-        if (Is(info.AttemptKiller) && !info.IsSuicide)
+        //キルできない
+        info.DoKill = false;
+
+        if (princeMax <= 0)
         {
-            (var killer, var target) = info.AttemptTuple;
-
-            princeMax--;
-            killer.RpcProtectedMurderPlayer(target);
-            target.RpcProtectedMurderPlayer(target);
-            Logger.Info($"{killer.GetNameWithRole()} : 恋人を作った", "OtakuPrincess");
-            SendRPCShot();
-
-            if (!isFirstSetting)
-            {
-                killer.RpcSetCustomRole(CustomRoles.Lovers);
-                List<byte> playerIds = new ();
-                playerIds.Add(killer.PlayerId);
-                Main.LoversPlayersV2.Add(killer.PlayerId, playerIds);
-                Main.isLoversLeaders.Add(killer.PlayerId);
-                Main.isLoversDeadV2.Add(killer.PlayerId, false);
-                isFirstSetting = true;
-            }
-            target.RpcSetCustomRole(CustomRoles.Lovers);
-
-            if (CheckOtherLovers(target.PlayerId, out byte teamLeaderId))
-            {
-                Main.LoversPlayersV2[teamLeaderId].Remove(target.PlayerId);
-            }
-            Main.LoversPlayersV2[killer.PlayerId].Add(target.PlayerId);
-            RPC.SyncLoversPlayers();
-            killer.ResetKillCooldown();
-            info.DoKill = false;
-            //foreach (var targets in Main.LoversPlayersV2[killer.PlayerId]) { Logger.Info("ラバーズ：" +targets.name,"オタク"); }
-            Utils.NotifyRoles();
-        }
-    }
-
-    private bool CheckOtherLovers(byte targetId, out byte leader)
-    {
-        leader = byte.MaxValue;
-
-        foreach (var list in Main.LoversPlayersV2)
-        {
-            if (list.Value.Contains(targetId))
-            {
-                leader = list.Key;
-                return true;
-            }
+            return;
         }
 
-        return false;
+        princeMax--;
+
+        (var killer, var target) = info.AttemptTuple;
+        LoversManager.CheckMurderLovers(killer,target);
+
+        //if (Is(info.AttemptKiller) && !info.IsSuicide)
+        //{
+        //    (var killer, var target) = info.AttemptTuple;
+
+        //    princeMax--;
+        //    killer.RpcProtectedMurderPlayer(target);
+        //    target.RpcProtectedMurderPlayer(target);
+        //    Logger.Info($"{killer.GetNameWithRole()} : 恋人を作った", "OtakuPrincess");
+        //    SendRPCShot();
+
+        //    if (!isFirstSetting)
+        //    {
+        //        killer.RpcSetCustomRole(CustomRoles.Lovers);
+        //        List<byte> playerIds = new ();
+        //        playerIds.Add(killer.PlayerId);
+        //        Main.LoversPlayersV2.Add(killer.PlayerId, playerIds);
+        //        Main.isLoversLeaders.Add(killer.PlayerId);
+        //        Main.isLoversDeadV2.Add(killer.PlayerId, false);
+        //        isFirstSetting = true;
+        //    }
+        //    target.RpcSetCustomRole(CustomRoles.Lovers);
+
+        //    if (CheckOtherLovers(target.PlayerId, out byte teamLeaderId))
+        //    {
+        //        //リーダー
+        //        if (target.PlayerId == teamLeaderId)
+        //        {
+        //            //相手ラバーズチームを自チームに加える
+        //            Main.LoversPlayersV2[killer.PlayerId].AddRange(Main.LoversPlayersV2[teamLeaderId]);
+        //            //相手ラバーズを削除
+        //            Main.LoversPlayersV2.Remove(teamLeaderId);
+        //            //リーダーとしても削除
+        //            Main.isLoversLeaders.Remove(teamLeaderId);
+        //            Main.isLoversDeadV2.Remove(teamLeaderId);
+        //        }
+        //        //巻き添えの人
+        //        else
+        //        {
+        //            Main.LoversPlayersV2[teamLeaderId].Remove(target.PlayerId);
+        //            Main.LoversPlayersV2[killer.PlayerId].Add(target.PlayerId);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        Main.LoversPlayersV2[killer.PlayerId].Add(target.PlayerId);
+        //    }
+        //    RPC.SyncLoversPlayers();
+        //    killer.ResetKillCooldown();
+        //    info.DoKill = false;
+        //    //foreach (var targets in Main.LoversPlayersV2[killer.PlayerId]) { Logger.Info("ラバーズ：" +targets.name,"オタク"); }
+        //    Utils.NotifyRoles();
+        //}
     }
+
     public bool OverrideKillButtonText(out string text)
     {
         text = Translator.GetString("PlatonicLoverButtonText");

@@ -11,7 +11,21 @@ using TownOfHostForE.Patches;
 
 namespace TownOfHostForE
 {
-    [HarmonyPatch(typeof(IntroCutscene), nameof(IntroCutscene.ShowRole))]
+    [HarmonyPatch(typeof(IntroCutscene), nameof(IntroCutscene.CoBegin))]
+    class SetUpRoleTextCoBeginPatch
+    {
+        public static void Postfix(IntroCutscene __instance, ref Il2CppSystem.Collections.IEnumerator __result)
+        {
+            //ShowRoleに直接パッチあて出来ないためCoBegin中にパッチを当てる
+            var patcher = new CoroutinPatcher(__result);
+            //ShowRoleはステートマシンクラスになっているためその実行前にパッチを当てる
+            //元々Postfixだが、タイミング的にはPrefixの方が適切なのでPrefixに当てる
+            patcher.AddPrefix(typeof(IntroCutscene._ShowRole_d__41), () => SetUpRoleTextPatch.Postfix(__instance));
+            __result = patcher.EnumerateWithPatch();
+        }
+    }
+    // Patchが当たらないが念のためコメントアウト
+    //[HarmonyPatch(typeof(IntroCutscene), nameof(IntroCutscene.ShowRole))]
     class SetUpRoleTextPatch
     {
         public static void Postfix(IntroCutscene __instance)
@@ -298,7 +312,7 @@ namespace TownOfHostForE
         public static void Postfix(IntroCutscene __instance)
         {
             if (!GameStates.IsInGame) return;
-            Main.introDestroyed = true;
+            Main.isFirstTurn = true;
 
             var mapId = Main.NormalOptions.MapId;
             // エアシップではまだ湧かない
@@ -314,7 +328,12 @@ namespace TownOfHostForE
             {
                 if (mapId != 4)
                 {
-                    Main.AllPlayerControls.Do(pc => pc.RpcResetAbilityCooldown());
+                    Main.AllPlayerControls.Do(pc =>
+                    {
+                        pc.GetRoleClass()?.OnSpawn(true);
+                        pc.SyncSettings();
+                        pc.RpcResetAbilityCooldown();
+                    });
                     if (Options.FixFirstKillCooldown.GetBool())
                         _ = new LateTask(() =>
                         {
@@ -360,6 +379,9 @@ namespace TownOfHostForE
                 }
             }
             Logger.Info("OnDestroy", "IntroCutscene");
+
+            GameStates.InTask = true;
+            Logger.Info("タスクフェイズ開始", "Phase");
         }
     }
 }

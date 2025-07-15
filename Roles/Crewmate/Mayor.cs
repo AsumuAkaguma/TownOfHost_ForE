@@ -74,7 +74,7 @@ public sealed class Mayor : RoleBase
             : opt.GetInt(Int32OptionNames.EmergencyCooldown);
         AURoleOptions.EngineerInVentMaxTime = 1;
     }
-    public override bool OnReportDeadBody(PlayerControl reporter, GameData.PlayerInfo target)
+    public override bool OnReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target)
     {
         if (Is(reporter) && target == null) //ボタン
             LeftButtonCount--;
@@ -85,8 +85,11 @@ public sealed class Mayor : RoleBase
         if (LeftButtonCount > 0)
         {
             var user = physics.myPlayer;
-            physics.RpcBootFromVent(ventId);
-            user?.ReportDeadBody(null);
+            //ホスト視点、vent処理中に会議を呼ぶとベントの矢印が残るので遅延させる
+            _ = new LateTask(() => user?.ReportDeadBody(null), 0.1f, "MayerPortableButton");
+
+            //ポータブルボタン時はベントから追い出す必要はない
+            return true;
         }
 
         return false;
@@ -125,10 +128,5 @@ public sealed class Mayor : RoleBase
 
         }
         return (votedForId, numVotes, doVote);
-    }
-    public override void AfterMeetingTasks()
-    {
-        if (HasPortableButton)
-            Player.RpcResetAbilityCooldown();
     }
 }

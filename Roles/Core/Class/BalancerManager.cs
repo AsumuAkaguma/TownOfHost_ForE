@@ -172,13 +172,11 @@ namespace TownOfHostForE.Roles.Core.Class
                     cRole.GetCustomRoleTypes() == Core.CustomRoleTypes.Impostor ||
                     pc.IsCrewKiller())
                 {
-                    Logger.Info($"キルカウント", "debug");
                     returnByte = Main.killCount.ContainsKey(pc.PlayerId) ? Main.killCount[pc.PlayerId] * (int)killBonus : 0;
                 }
                 //キラーじゃないならタスク数参照
                 else
                 {
-                    Logger.Info($"タスクカウント", "debug");
                     returnByte = pc.GetPlayerTaskState().CompletedTasksCount;
                 }
 
@@ -186,7 +184,6 @@ namespace TownOfHostForE.Roles.Core.Class
             }
             catch (Exception ex)
             {
-                Logger.Info($"{ex.Message}:{ex.StackTrace}", "debug");
                 return 0;
             }
         }

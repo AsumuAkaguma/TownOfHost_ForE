@@ -42,7 +42,7 @@ public sealed class Nimrod : RoleBase
         playerIdList.Add(Player.PlayerId);
     }
 
-    public static GameData.PlayerInfo VoteChange(GameData.PlayerInfo Exiled)
+    public static NetworkedPlayerInfo VoteChange(NetworkedPlayerInfo Exiled)
     {
         if (Exiled == null || !playerIdList.Contains(Exiled.PlayerId)) return Exiled;
 

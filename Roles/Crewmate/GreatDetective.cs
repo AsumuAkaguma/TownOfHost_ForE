@@ -246,7 +246,7 @@ public sealed class GreatDetective : RoleBase
     //-------以下通報系-------//
 
 
-    public override bool OnReportDeadBody(PlayerControl reporter, GameData.PlayerInfo target)
+    public override bool OnReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target)
     {
         //自分の通報じゃない場合
         if (reporter != Player) return true;

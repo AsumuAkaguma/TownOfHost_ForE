@@ -202,6 +202,9 @@ namespace TownOfHostForE
 
         // プレイメニュー，アカウントメニュー，クレジット画面が開かれたらロゴとボタンを消す
         [HarmonyPatch(nameof(MainMenuManager.OpenGameModeMenu))]
+        [HarmonyPatch(nameof(MainMenuManager.OpenOnlineMenu))]
+        [HarmonyPatch(nameof(MainMenuManager.OpenEnterCodeMenu))]
+        [HarmonyPatch(nameof(MainMenuManager.ClickBackOnline))]
         [HarmonyPatch(nameof(MainMenuManager.OpenAccountMenu))]
         [HarmonyPatch(nameof(MainMenuManager.OpenCredits))]
         [HarmonyPostfix]
@@ -299,6 +302,24 @@ namespace TownOfHostForE
             if (CredentialsPatch.TohLogo != null)
             {
                 CredentialsPatch.TohLogo.gameObject.SetActive(true);
+            }
+        }
+        [HarmonyPatch(nameof(MainMenuManager.OpenOnlineMenu)), HarmonyPostfix]
+        public static void FindGameButtonDisable(MainMenuManager __instance)
+        {
+            __instance.findGameButton.gameObject.SetActive(false);
+            //中央Lineを消す
+            var line = __instance.findGameButton.gameObject.transform.parent.Find("Line");
+            if (line != null)
+            {
+                line.gameObject.SetActive(false);
+            }
+            //ロビー作成、コード入力ボタンを中央に移動
+            __instance.createGameButton.transform.SetLocalX(0);
+            var enterCodeButton = __instance.createGameButton.transform.parent.Find("Enter Code Button");
+            if (enterCodeButton != null)
+            {
+                enterCodeButton.gameObject.transform.SetLocalX(0);
             }
         }
     }

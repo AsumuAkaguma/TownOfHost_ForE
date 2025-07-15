@@ -13,7 +13,7 @@ namespace TownOfHostForE.Roles.AddOns.Crewmate
         public static List<byte> playerIdList = new();
         public static void SetupCustomOption()
         {
-            Options.SetupRoleOptions(Id, TabGroup.Addons, CustomRoles.CompreteCrew);
+            Options.SetupRoleOptions(Id, TabGroup.Addons, CustomRoles.CompreteCrew, Utils.GetRoleColor(CustomRoles.CompreteCrew));
             Options.SetUpAddOnOptions(Id + 10, CustomRoles.CompreteCrew, TabGroup.Addons);
         }
         [GameModuleInitializer]

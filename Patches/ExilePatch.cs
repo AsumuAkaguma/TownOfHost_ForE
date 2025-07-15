@@ -11,7 +11,7 @@ namespace TownOfHostForE
 {
     class ExileControllerWrapUpPatch
     {
-        public static GameData.PlayerInfo AntiBlackout_LastExiled;
+        public static NetworkedPlayerInfo AntiBlackout_LastExiled;
         [HarmonyPatch(typeof(ExileController), nameof(ExileController.WrapUp))]
         class BaseExileControllerPatch
         {
@@ -19,7 +19,7 @@ namespace TownOfHostForE
             {
                 try
                 {
-                    WrapUpPostfix(__instance.exiled);
+                    WrapUpPostfix(__instance.initData.networkedPlayer);
                 }
                 catch (Exception ex)
                 {
@@ -27,19 +27,35 @@ namespace TownOfHostForE
                 }
                 finally
                 {
-                    WrapUpFinalizer(__instance.exiled);
+                    WrapUpFinalizer(__instance.initData.networkedPlayer);
                 }
             }
         }
 
-        [HarmonyPatch(typeof(AirshipExileController), nameof(AirshipExileController.WrapUpAndSpawn))]
+        [HarmonyPatch(typeof(AirshipExileController), nameof(AirshipExileController.Animate))]
+        class AirshipStatusPatch
+        {
+            public static void Postfix(AirshipExileController __instance, ref Il2CppSystem.Collections.IEnumerator __result)
+            {
+                //WrapUpAndSpawnに直接パッチが当たらないのでAnimateメソッド中にパッチを当てる
+                var pathcer = new CoroutinPatcher(__result);
+                //WrapUpAndSpawnはステートマシンとしてクラス化されているためそのクラス実行前にパッチを当てる
+                //元々Postfixだが、タイミング的にはPrefixの方が適切なのでPrefixに当てる
+                pathcer.AddPrefix(typeof(AirshipExileController._WrapUpAndSpawn_d__11), () =>
+                    AirshipExileControllerPatch.Postfix(__instance)
+                );
+                __result = pathcer.EnumerateWithPatch();
+            }
+        }
+        // Patchが当たらないが念のためコメントアウト
+        //[HarmonyPatch(typeof(AirshipExileController), nameof(AirshipExileController.WrapUpAndSpawn))]
         class AirshipExileControllerPatch
         {
             public static void Postfix(AirshipExileController __instance)
             {
                 try
                 {
-                    WrapUpPostfix(__instance.exiled);
+                    WrapUpPostfix(__instance.initData.networkedPlayer);
                 }
                 catch (Exception ex)
                 {
@@ -47,11 +63,11 @@ namespace TownOfHostForE
                 }
                 finally
                 {
-                    WrapUpFinalizer(__instance.exiled);
+                    WrapUpFinalizer(__instance.initData.networkedPlayer);
                 }
             }
         }
-        static void WrapUpPostfix(GameData.PlayerInfo exiled)
+        static void WrapUpPostfix(NetworkedPlayerInfo exiled)
         {
             if (AntiBlackout.OverrideExiledPlayer)
             {
@@ -121,10 +137,19 @@ namespace TownOfHostForE
             FallFromLadder.Reset();
             Utils.CountAlivePlayers(true);
             Utils.AfterMeetingTasks();
-            Utils.SyncAllSettings();
+            if (mapId != 4)
+            {
+                foreach (var pc in Main.AllPlayerControls)
+                {
+                    pc.GetRoleClass()?.OnSpawn();
+                    pc.SyncSettings();
+                    pc.RpcResetAbilityCooldown();
+                }
+
+            }
             Utils.NotifyRoles();
         }
-        static void WrapUpFinalizer(GameData.PlayerInfo exiled)
+        static void WrapUpFinalizer(NetworkedPlayerInfo exiled)
         {
             //WrapUpPostfixで例外が発生しても、この部分だけは確実に実行されます。
             if (AmongUsClient.Instance.AmHost)
@@ -137,7 +162,7 @@ namespace TownOfHostForE
                         exiled != null && //exiledがnullでない
                         exiled.Object != null) //exiled.Objectがnullでない
                     {
-                        exiled.Object.RpcExileV2();
+                        exiled.Object.RpcExile();
                     }
                 }, 0.5f, "Restore IsDead Task");
                 _ = new LateTask(() =>
@@ -151,7 +176,7 @@ namespace TownOfHostForE
                         Logger.Info($"{player.GetNameWithRole()}を{x.Value}で死亡させました", "AfterMeetingDeath");
                         state.DeathReason = x.Value;
                         state.SetDead();
-                        player?.RpcExileV2();
+                        player?.RpcExile();
                         if (x.Value == CustomDeathReason.Suicide)
                             player?.SetRealKiller(player, true);
                         if (requireResetCam)
@@ -166,12 +191,13 @@ namespace TownOfHostForE
             GameStates.AlreadyDied |= !Utils.IsAllAlive;
             RemoveDisableDevicesPatch.UpdateDisableDevices();
             SoundManager.Instance.ChangeAmbienceVolume(DataManager.Settings.Audio.AmbienceVolume);
+            GameStates.InTask = true;
             Logger.Info("タスクフェイズ開始", "Phase");
             Badger.MeetingEndCheck();
             Tiikawa.MeetingEndCheck();
         }
     }
-    //static void WrapUpFinalizer(GameData.PlayerInfo exiled)
+    //static void WrapUpFinalizer(NetworkedPlayerInfo exiled)
     //{
     //    //WrapUpPostfixで例外が発生しても、この部分だけは確実に実行されます。
     //    if (AmongUsClient.Instance.AmHost)

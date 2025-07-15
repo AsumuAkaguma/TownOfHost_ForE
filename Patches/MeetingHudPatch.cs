@@ -177,31 +177,21 @@ public static class MeetingHudPatch
 
                 _ = new LateTask(() =>
                 {
-                    foreach (var seen in Main.AllPlayerControls)
+                    foreach (var seer in Main.AllPlayerControls)
                     {
-                        var seenName = seen.GetRealName(isMeeting: true);
-                        var coloredName = Utils.ColorString(seen.GetRoleColor(), seenName);
-                        foreach (var seer in Main.AllPlayerControls)
+                        if (seer.IsModClient()) continue;
+                        var sender = CustomRpcSender.Create("SetNameToChat", Hazel.SendOption.Reliable);
+                        sender.StartMessage(seer.GetClientId());
+
+                        foreach (var seen in Main.AllPlayerControls)
                         {
-                            seen.RpcSetNamePrivate(
-                                seer == seen ? coloredName : seenName,
-                                true,
-                                seer);
+                            var seenName = seen.GetRealName(isMeeting: true);
+                            var coloredName = Utils.ColorString(seen.GetRoleColor(), seenName);
+                            sender.RpcSetName(seen, seer == seen ? coloredName : seenName, seer);
                         }
+                        sender.SendMessage();
                     }
                     ChatUpdatePatch.DoBlockChat = false;
-                    //foreach (var seer in Main.AllPlayerControls)
-                    //{
-                    //    foreach (var target in Main.AllPlayerControls)
-                    //    {
-                    //        var seerName = seer.GetRealName(isMeeting: true);
-                    //        var coloredName = Utils.ColorString(seer.GetRoleColor(), seerName);
-                    //        seer.RpcSetNamePrivate(
-                    //            seer == target ? coloredName : seerName,
-                    //            true);
-                    //    }
-                    //}
-                    //ChatUpdatePatch.DoBlockChat = false;
                 }, 3f, "SetName To Chat");
             }
 
@@ -265,9 +255,9 @@ public static class MeetingHudPatch
                     switch (subRole)
                     {
                         case CustomRoles.Lovers:
-                            //if (seer.Is(CustomRoles.Lovers) || seer.Data.IsDead)
-                            if (Utils.CheckMyLovers(seer.PlayerId,target.PlayerId) || seer.Data.IsDead)
-                                sb.Append(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Lovers), "♥"));
+                            if (LoversManager.CheckMyLovers(seer.PlayerId,target.PlayerId) || seer.Data.IsDead)
+                                //sb.Append(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Lovers), "♥"));
+                                sb.Append(Utils.ColorString(LoversManager.GetLeaderColor(target.PlayerId), "♥"));
                             break;
                     }
                 }
@@ -331,7 +321,7 @@ public static class MeetingHudPatch
                 __instance.playerStates.DoIf(x => x.HighlightedFX.enabled, x =>
                 {
                     var player = Utils.GetPlayerById(x.TargetPlayerId);
-                    player.RpcExileV2();
+                    player.RpcExile();
                     var state = PlayerState.GetByPlayerId(player.PlayerId);
                     state.DeathReason = CustomDeathReason.Execution;
                     state.SetDead();
@@ -373,42 +363,13 @@ public static class MeetingHudPatch
         {
             //Loversの後追い
             //if ((CustomRoles.Lovers.IsPresent() || CustomRoles.PlatonicLover.IsPresent() || CustomRoles.OtakuPrincess.IsPresent()) && !Main.isLoversDead && Main.LoversPlayers.Find(lp => lp.PlayerId == playerId) != null)
-            if(CheckLoversSuicide(playerId))
-                FixedUpdatePatch.LoversSuicide(playerId, true);
+            if(LoversManager.CheckLoversSuicide(playerId))
+                LoversManager.LoversSuicide(playerId, true);
             //道連れチェック
             RevengeOnExile(playerId, deathReason);
         }
     }
 
-    private static bool CheckLoversSuicide(byte playerId)
-    {
-        //ラバーズ系がいない
-        if (!(CustomRoles.Lovers.IsPresent() || CustomRoles.PlatonicLover.IsPresent() || CustomRoles.OtakuPrincess.IsPresent()))
-             return false;
-
-        byte ownerId = byte.MaxValue;
-
-        foreach (var list in Main.LoversPlayersV2)
-        {
-            foreach (var id in list.Value)
-            {
-                if (id == playerId)
-                {
-                    ownerId = list.Key;
-                    break;
-                }
-            }
-            if (ownerId != byte.MaxValue)
-                break;
-        }
-
-        //ラバーズに所属していないなら抜ける
-        if (ownerId == byte.MaxValue)
-            return false;
-
-
-        return !Main.isLoversDeadV2[ownerId];
-    }
 
     //道連れ
     public static List<(PlayerControl, PlayerControl)> RevengeTargetPlayer;

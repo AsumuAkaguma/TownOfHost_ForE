@@ -1,15 +1,19 @@
 using UnityEngine;
+
+using System.Collections.Generic;
+using System.Linq;
+
 using AmongUs.GameOptions;
 
 using TownOfHostForE.Roles.Core;
 using TownOfHostForE.Roles.Core.Interfaces;
 using static TownOfHostForE.Translator;
-using static UnityEngine.GraphicsBuffer;
 using Hazel;
+using TownOfHostForE.Roles.Core.Class;
 
 namespace TownOfHostForE.Roles.Impostor
 {
-    public sealed class Eraser : RoleBase, IImpostor
+    public sealed class Eraser : ShapeSwitchManager, IImpostor
     {
         /// <summary>
         ///  20000:TOH4E役職
@@ -36,7 +40,6 @@ namespace TownOfHostForE.Roles.Impostor
             AbilityCool = OptionAbilityCool.GetFloat();
             AbilityCount = OptionAbilityCount.GetInt();
             TargetId = byte.MaxValue;
-            SetTarget = false;
 
         }
         private static OptionItem OptionAbilityCool;
@@ -49,8 +52,6 @@ namespace TownOfHostForE.Roles.Impostor
         private static float AbilityCool;
         private static float AbilityCount;
         public byte TargetId;
-        bool canAbility = false;
-        bool SetTarget = false;
 
 
         private static void SetUpOptionItem()
@@ -63,36 +64,32 @@ namespace TownOfHostForE.Roles.Impostor
         public override void ApplyGameOptions(IGameOptions opt)
         {
             AURoleOptions.ShapeshifterCooldown = AbilityCool;
-            AURoleOptions.ShapeshifterDuration = 1f;
+            //AURoleOptions.ShapeshifterDuration = 1f;
         }
 
-        public override void OnShapeshift(PlayerControl target)
-        {
-            var shapeshifting = !Is(target);
-            if (target == null || !target.IsAlive()) return;
-            if (!shapeshifting) return;
-            if (AbilityCount == 0) return;
-            var cRole = target.GetCustomRole();
-            if (cRole.GetCustomRoleTypes() == CustomRoleTypes.Impostor) return;
-            TargetId = target.PlayerId;
-            canAbility = true;
-            SendRPC();
-            Player.RpcResetAbilityCooldown();
-            Logger.Info("ターゲットセット：" + target.name,"Eraser");
-        }
+
         public override string GetAbilityButtonText() => GetString("EraserWait");
         public override string GetProgressText(bool comms = false) => Utils.ColorString(AbilityCount > 0 ? Color.red : Color.gray, $"({AbilityCount})");
         public override void AfterMeetingTasks()
         {
             if (Player.IsAlive())
                 Player.RpcResetAbilityCooldown();
-            if (!SetTarget) return;
-            var target = Utils.GetPlayerById(TargetId);
-            if(target == null) return;
-            target.RpcSetCustomRole(CustomRoles.Crewmate);
-            TargetId = byte.MaxValue;
-            SetTarget = false;
-            Logger.Info($"Make Crew:{target.name}", "Eraser");
+
+            if (TargetId != byte.MaxValue)
+            {
+                var target = Utils.GetPlayerById(TargetId);
+                if (target == null) return;
+                target.RpcSetCustomRole(CustomRoles.Crewmate);
+                TargetId = byte.MaxValue;
+                Logger.Info($"Make Crew:{target.name}", "Eraser");
+            }
+
+            //称号とかつけるよう
+            new LateTask(() =>
+            {
+                Utils.NotifyRoles(NoCache: true);
+            }, 0.5f);
+
         }
         private void SendRPC()
         {
@@ -107,30 +104,38 @@ namespace TownOfHostForE.Roles.Impostor
             TargetId = reader.ReadByte();
             AbilityCount = reader.ReadInt32();
         }
-        public override void OnFixedUpdate(PlayerControl player)
-        {
-            if (!canAbility) return;
-            if (TargetId == byte.MaxValue) return;
-            var target = Utils.GetPlayerById(TargetId);
-            if (target == null || !target.IsAlive()) return;
-            float targetDistance = Vector2.Distance(Player.transform.position, target.transform.position);
 
-            var KillRange = GameOptionsData.KillDistances[Mathf.Clamp(Main.NormalOptions.KillDistance, 0, 2)];
-            if (targetDistance <= KillRange)
+        public override void ShapeSwitch()
+        {
+
+            Dictionary<float, byte> KillDic = new();
+            var KillRange = NormalGameOptionsV09.KillDistances[Mathf.Clamp(Main.NormalOptions.KillDistance, 0, 2)];
+
+            //範囲に入っている人算出
+            foreach (var pc in Main.AllAlivePlayerControls)
             {
-                //player.RpcProtectedMurderPlayer(); //変えたことが分かるように。
-                AbilityCount--;
-                canAbility = false;
-                SetTarget = true;
-                Utils.NotifyRoles();
+                if (!pc.IsAlive()) continue;
+
+                if (pc == Player) continue;
+
+                if (pc.GetCustomRole().GetCustomRoleTypes() == CustomRoleTypes.Impostor) continue;
+
+                float tempTargetDistance = Vector2.Distance(Player.transform.position, pc.transform.position); ;
+
+                bool checker = tempTargetDistance <= KillRange && pc.CanMove;
+
+                if (!checker) continue;
+
+                KillDic.Add(tempTargetDistance, pc.PlayerId);
             }
 
-        }
-        public override bool OnReportDeadBody(PlayerControl reporter, GameData.PlayerInfo target)
-        {
-            if(!SetTarget) TargetId = byte.MaxValue;
-            canAbility = false;
-            return true;
+            if (KillDic.Count == 0) return;
+
+            //距離が一番近い人算出
+            var killTargetKeys = KillDic.Keys.OrderBy(x => x).FirstOrDefault();
+            TargetId = KillDic[killTargetKeys];
+            AbilityCount--;
+            Utils.NotifyRoles();
         }
     }
 }
